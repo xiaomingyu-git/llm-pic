@@ -1,22 +1,26 @@
-import { sendChatMessage, APIError, APIErrorType } from './llmService'
-import type { LLMConfiguration, DiagramGenerationOptions } from '../types'
+import { sendChatMessage, APIError, APIErrorType } from './llmService';
+import type { LLMConfiguration, DiagramGenerationOptions } from '../types';
 
 // 图表生成结果
 export interface DiagramGenerationResult {
-  success: boolean
-  code: string
-  format: string
+  success: boolean;
+  code: string;
+  format: string;
   metadata: {
-    generatedAt: Date
-    processingTime: number
-    tokensUsed: number
-    model: string
-  }
+    generatedAt: Date;
+    processingTime: number;
+    tokensUsed: number;
+    model: string;
+  };
   error?: {
-    type: 'api_error' | 'validation_error' | 'parsing_error' | 'generation_error'
-    message: string
-    details?: any
-  }
+    type:
+    | 'api_error'
+    | 'validation_error'
+    | 'parsing_error'
+    | 'generation_error';
+    message: string;
+    details?: any;
+  };
 }
 
 // 预定义的提示词模板
@@ -39,7 +43,7 @@ const PROMPT_TEMPLATES = {
 
 请只返回Mermaid代码，不要包含额外的解释文字。`,
 
-    user_template: (description: string, _options: DiagramGenerationOptions) =>
+    user_template: (description: string, options: DiagramGenerationOptions) =>
       `请为以下系统架构生成${options.format.toUpperCase()}图表代码：
 
 ${description}
@@ -51,7 +55,7 @@ ${description}
 - 添加图标：${options.addIcons ? '是' : '否'}
 - 主题风格：${options.theme}
 
-请生成可以在${options.format.toUpperCase()}中直接使用的完整代码。`
+请生成可以在${options.format.toUpperCase()}中直接使用的完整代码。`,
   },
 
   plantuml: {
@@ -71,7 +75,7 @@ ${description}
 
 请只返回PlantUML代码，不要包含额外的解释文字。`,
 
-    user_template: (description: string, _options: DiagramGenerationOptions) =>
+    user_template: (description: string, options: DiagramGenerationOptions) =>
       `请为以下系统架构生成PlantUML图表代码：
 
 ${description}
@@ -81,7 +85,7 @@ ${description}
 - 包含详细说明：${options.includeDetails ? '是' : '否'}
 - 添加图标：${options.addIcons ? '是' : '否'}
 
-请生成可以在PlantUML中直接使用的完整代码（包含@startuml和@enduml）。`
+请生成可以在PlantUML中直接使用的完整代码（包含@startuml和@enduml）。`,
   },
 
   xml: {
@@ -109,12 +113,12 @@ ${description}
 - 组件类型包括：rectangle、database、server、client等
 - 连接关系要明确标示方向
 
-请生成符合规范的XML架构图代码。`
-  }
-}
+请生成符合规范的XML架构图代码。`,
+  },
+};
 
 export class DiagramService {
-  private static readonly MAX_RETRIES = 3
+  private static readonly MAX_RETRIES = 3;
 
   /**
    * 生成架构图
@@ -124,7 +128,7 @@ export class DiagramService {
     description: string,
     _options: Partial<DiagramGenerationOptions> = {}
   ): Promise<DiagramGenerationResult> {
-    const startTime = Date.now()
+    const startTime = Date.now();
     const mergedOptions: DiagramGenerationOptions = {
       format: 'mermaid',
       theme: 'default',
@@ -135,26 +139,30 @@ export class DiagramService {
       generateCode: false,
       customStyles: '',
       timeout: 60000, // 默认超时时间
-      ..._options
-    }
+      ..._options,
+    };
 
     try {
       // 验证输入
-      this.validateInput(description)
+      this.validateInput(description);
 
       // 构建提示词
-      const prompt = this.buildPrompt(description, mergedOptions)
+      const prompt = this.buildPrompt(description, mergedOptions);
 
       // 调用LLM API
-      const response = await this.callLLMWithRetry(config, prompt, mergedOptions)
+      const response = await this.callLLMWithRetry(
+        config,
+        prompt,
+        mergedOptions
+      );
 
       // 解析响应
-      const diagramCode = this.parseResponse(response, mergedOptions.format)
+      const diagramCode = this.parseResponse(response, mergedOptions.format);
 
       // 验证生成的代码
-      this.validateDiagramCode(diagramCode, mergedOptions.format)
+      this.validateDiagramCode(diagramCode, mergedOptions.format);
 
-      const processingTime = Date.now() - startTime
+      const processingTime = Date.now() - startTime;
 
       return {
         success: true,
@@ -164,11 +172,11 @@ export class DiagramService {
           generatedAt: new Date(),
           processingTime,
           tokensUsed: response.usage?.total_tokens || 0,
-          model: response.model || 'unknown'
-        }
-      }
+          model: response.model || 'unknown',
+        },
+      };
     } catch (error) {
-      const processingTime = Date.now() - startTime
+      const processingTime = Date.now() - startTime;
 
       return {
         success: false,
@@ -178,23 +186,23 @@ export class DiagramService {
           generatedAt: new Date(),
           processingTime,
           tokensUsed: 0,
-          model: 'unknown'
+          model: 'unknown',
         },
-        error: this.parseError(error)
-      }
+        error: this.parseError(error),
+      };
     }
   }
 
   /**
    * 流式生成架构图
    */
-  static async* generateDiagramStream(
+  static async *generateDiagramStream(
     config: LLMConfiguration,
     description: string,
     _options: Partial<DiagramGenerationOptions> = {},
     onProgress?: (progress: number, text: string) => void
   ): AsyncGenerator<string, DiagramGenerationResult, unknown> {
-    const startTime = Date.now()
+    const startTime = Date.now();
     const mergedOptions: DiagramGenerationOptions = {
       format: 'mermaid',
       theme: 'default',
@@ -205,53 +213,56 @@ export class DiagramService {
       generateCode: false,
       customStyles: '',
       timeout: 60000, // 默认超时时间
-      ..._options
-    }
+      ..._options,
+    };
 
     try {
-      this.validateInput(description)
-      const prompt = this.buildPrompt(description, mergedOptions)
+      this.validateInput(description);
+      const prompt = this.buildPrompt(description, mergedOptions);
 
-      let fullResponse = ''
-      let lastProgressUpdate = Date.now()
+      let fullResponse = '';
+      let lastProgressUpdate = Date.now();
 
       // 模拟流式响应（由于我们的API客户端不支持真正的流式，这里用轮询模拟）
       for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
         try {
           const response = await sendChatMessage(config, prompt, {
-            model: "gpt-3.5-turbo",
+            model: 'gpt-3.5-turbo',
             maxTokens: 2000,
-            temperature: 0.3
-          })
+            temperature: 0.3,
+          });
 
-          const content = response.choices?.[0]?.message?.content || ''
+          const content = response.choices?.[0]?.message?.content || '';
 
           // 模拟流式输出
           for (let i = 0; i < content.length; i += 10) {
-            const chunk = content.slice(0, i + 10)
-            yield chunk
+            const chunk = content.slice(0, i + 10);
+            yield chunk;
 
             // 进度更新
             if (onProgress && Date.now() - lastProgressUpdate > 500) {
-              onProgress((i + 10) / content.length * 100, chunk)
-              lastProgressUpdate = Date.now()
+              onProgress(((i + 10) / content.length) * 100, chunk);
+              lastProgressUpdate = Date.now();
             }
 
-            await new Promise(resolve => setTimeout(resolve, 50))
+            await new Promise((resolve) => setTimeout(resolve, 50));
           }
 
-          fullResponse = content
-          break
+          fullResponse = content;
+          break;
         } catch (error) {
           if (attempt === this.MAX_RETRIES) {
-            throw error
+            throw error;
           }
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
         }
       }
 
-      const diagramCode = this.parseResponse(fullResponse, mergedOptions.format)
-      this.validateDiagramCode(diagramCode, mergedOptions.format)
+      const diagramCode = this.parseResponse(
+        fullResponse,
+        mergedOptions.format
+      );
+      this.validateDiagramCode(diagramCode, mergedOptions.format);
 
       return {
         success: true,
@@ -261,9 +272,9 @@ export class DiagramService {
           generatedAt: new Date(),
           processingTime: Date.now() - startTime,
           tokensUsed: 0, // 在流式响应中难以准确计算
-          model: 'gpt-3.5-turbo'
-        }
-      }
+          model: 'gpt-3.5-turbo',
+        },
+      };
     } catch (error) {
       return {
         success: false,
@@ -273,23 +284,26 @@ export class DiagramService {
           generatedAt: new Date(),
           processingTime: Date.now() - startTime,
           tokensUsed: 0,
-          model: 'unknown'
+          model: 'unknown',
         },
-        error: this.parseError(error)
-      }
+        error: this.parseError(error),
+      };
     }
   }
 
   /**
    * 构建提示词
    */
-  private static buildPrompt(description: string, options: DiagramGenerationOptions): string {
-    const template = PROMPT_TEMPLATES[options.format]
+  private static buildPrompt(
+    description: string,
+    options: DiagramGenerationOptions
+  ): string {
+    const template = PROMPT_TEMPLATES[options.format];
     if (!template) {
-      throw new Error(`不支持的图表格式: ${options.format}`)
+      throw new Error(`不支持的图表格式: ${options.format}`);
     }
 
-    return template.user_template(description, options)
+    return template.user_template(description, options);
   }
 
   /**
@@ -300,48 +314,51 @@ export class DiagramService {
     prompt: string,
     _options: DiagramGenerationOptions
   ): Promise<any> {
-    let lastError: any
+    let lastError: any;
 
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
       try {
         const response = await sendChatMessage(config, prompt, {
-          model: "gpt-3.5-turbo",
+          model: 'gpt-3.5-turbo',
           maxTokens: 2000,
-          temperature: 0.3
-        })
+          temperature: 0.3,
+        });
 
-        return response
+        return response;
       } catch (error) {
-        lastError = error
+        lastError = error;
 
         // 如果是认证错误，不重试
-        if (error instanceof APIError && error.type === APIErrorType.AUTHENTICATION_ERROR) {
-          throw error
+        if (
+          error instanceof APIError &&
+          error.type === APIErrorType.AUTHENTICATION_ERROR
+        ) {
+          throw error;
         }
 
         // 如果不是最后一次尝试，等待后重试
         if (attempt < this.MAX_RETRIES) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000) // 指数退避
-          await new Promise(resolve => setTimeout(resolve, delay))
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 指数退避
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     }
 
-    throw lastError
+    throw lastError;
   }
 
   /**
    * 解析响应
    */
   private static parseResponse(response: any, format: string): string {
-    const content = response.choices?.[0]?.message?.content || ''
+    const content = response.choices?.[0]?.message?.content || '';
 
     if (!content.trim()) {
-      throw new Error('AI响应为空')
+      throw new Error('AI响应为空');
     }
 
     // 提取图表代码
-    return this.extractDiagramCode(content, format)
+    return this.extractDiagramCode(content, format);
   }
 
   /**
@@ -349,19 +366,21 @@ export class DiagramService {
    */
   private static extractDiagramCode(content: string, format: string): string {
     // 移除代码块标记
-    let code = content.replace(/```(?:mermaid|plantuml|xml)?\n?/gi, '').replace(/```\s*$/g, '')
+    let code = content
+      .replace(/```(?:mermaid|plantuml|xml)?\n?/gi, '')
+      .replace(/```\s*$/g, '');
 
     // 对于PlantUML，确保包含开始和结束标记
     if (format === 'plantuml') {
       if (!code.includes('@startuml')) {
-        code = `@startuml\n${code}`
+        code = `@startuml\n${code}`;
       }
       if (!code.includes('@enduml')) {
-        code = `${code}\n@enduml`
+        code = `${code}\n@enduml`;
       }
     }
 
-    return code.trim()
+    return code.trim();
   }
 
   /**
@@ -369,15 +388,15 @@ export class DiagramService {
    */
   private static validateInput(description: string): void {
     if (!description || !description.trim()) {
-      throw new Error('架构描述不能为空')
+      throw new Error('架构描述不能为空');
     }
 
     if (description.trim().length < 10) {
-      throw new Error('架构描述至少需要10个字符')
+      throw new Error('架构描述至少需要10个字符');
     }
 
     if (description.trim().length > 5000) {
-      throw new Error('架构描述不能超过5000字符')
+      throw new Error('架构描述不能超过5000字符');
     }
   }
 
@@ -386,20 +405,23 @@ export class DiagramService {
    */
   private static validateDiagramCode(code: string, format: string): void {
     if (!code || !code.trim()) {
-      throw new Error('生成的图表代码为空')
+      throw new Error('生成的图表代码为空');
     }
 
     // 基本语法检查
     if (format === 'mermaid') {
       // 检查是否包含基本的Mermaid关键字
-      const hasValidKeyword = /^(graph|flowchart|sequence|gantt|class|git|pie|journey|state|er|pie|block|timeline|mindmap)/i.test(code.trim())
+      const hasValidKeyword =
+        /^(graph|flowchart|sequence|gantt|class|git|pie|journey|state|er|pie|block|timeline|mindmap)/i.test(
+          code.trim()
+        );
       if (!hasValidKeyword) {
-        throw new Error('生成的代码不符合Mermaid语法规范')
+        throw new Error('生成的代码不符合Mermaid语法规范');
       }
     } else if (format === 'plantuml') {
       // 检查是否包含PlantUML开始/结束标记
       if (!code.includes('@startuml') || !code.includes('@enduml')) {
-        throw new Error('生成的代码不符合PlantUML语法规范')
+        throw new Error('生成的代码不符合PlantUML语法规范');
       }
     }
   }
@@ -414,41 +436,47 @@ export class DiagramService {
         message: error.message,
         details: {
           statusCode: error.statusCode,
-          errorType: error.type
-        }
-      }
+          errorType: error.type,
+        },
+      };
     }
 
     if (error instanceof Error) {
       return {
-        type: error.message.includes('语法') ? 'parsing_error' : 'generation_error',
-        message: error.message
-      }
+        type: error.message.includes('语法')
+          ? 'parsing_error'
+          : 'generation_error',
+        message: error.message,
+      };
     }
 
     return {
       type: 'generation_error',
       message: '未知错误',
-      details: error
-    }
+      details: error,
+    };
   }
 
   /**
    * 获取支持的图表格式
    */
-  static getSupportedFormats(): Array<{ value: string; label: string; description: string }> {
+  static getSupportedFormats(): Array<{
+    value: string;
+    label: string;
+    description: string;
+  }> {
     return [
       {
         value: 'mermaid',
         label: 'Mermaid',
-        description: '简单易用的图表语法，适合快速生成'
+        description: '简单易用的图表语法，适合快速生成',
       },
       {
         value: 'plantuml',
         label: 'PlantUML',
-        description: '功能强大的UML工具，支持复杂图表'
-      }
-    ]
+        description: '功能强大的UML工具，支持复杂图表',
+      },
+    ];
   }
 
   /**
@@ -462,7 +490,7 @@ export class DiagramService {
           style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
           style B fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
           style C fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-        `
+        `,
       },
       {
         name: '商务灰',
@@ -470,7 +498,7 @@ export class DiagramService {
           style A fill:#f5f5f5,stroke:#424242,stroke-width:2px
           style B fill:#eeeeee,stroke:#616161,stroke-width:2px
           style C fill:#fafafa,stroke:#757575,stroke-width:2px
-        `
+        `,
       },
       {
         name: '活力橙',
@@ -478,12 +506,12 @@ export class DiagramService {
           style A fill:#fff3e0,stroke:#e65100,stroke-width:2px
           style B fill:#fce4ec,stroke:#c2185b,stroke-width:2px
           style C fill:#f1f8e9,stroke:#33691e,stroke-width:2px
-        `
-      }
-    ]
+        `,
+      },
+    ];
   }
 }
 
 // 导出便捷函数
-export const generateDiagram = DiagramService.generateDiagram
-export const generateDiagramStream = DiagramService.generateDiagramStream
+export const generateDiagram = DiagramService.generateDiagram;
+export const generateDiagramStream = DiagramService.generateDiagramStream;

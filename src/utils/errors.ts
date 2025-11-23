@@ -1,4 +1,4 @@
-import type { AppError } from '../types'
+import type { AppError } from '../types';
 
 // 错误代码常量
 export const ERROR_CODES = {
@@ -38,8 +38,8 @@ export const ERROR_CODES = {
   // 系统错误
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
   INITIALIZATION_FAILED: 'INITIALIZATION_FAILED',
-  FEATURE_NOT_SUPPORTED: 'FEATURE_NOT_SUPPORTED'
-} as const
+  FEATURE_NOT_SUPPORTED: 'FEATURE_NOT_SUPPORTED',
+} as const;
 
 // 错误类型映射
 const ERROR_MESSAGES = {
@@ -72,17 +72,17 @@ const ERROR_MESSAGES = {
 
   [ERROR_CODES.UNKNOWN_ERROR]: '未知错误，请重试',
   [ERROR_CODES.INITIALIZATION_FAILED]: '应用初始化失败',
-  [ERROR_CODES.FEATURE_NOT_SUPPORTED]: '当前浏览器不支持此功能'
-} as const
+  [ERROR_CODES.FEATURE_NOT_SUPPORTED]: '当前浏览器不支持此功能',
+} as const;
 
 // 自定义错误类
 export class AppException extends Error {
-  public readonly code: string
-  public readonly userMessage: string
-  public readonly technicalDetails?: any
-  public readonly timestamp: Date
-  public readonly recoverable: boolean
-  public readonly suggestions: string[]
+  public readonly code: string;
+  public readonly userMessage: string;
+  public readonly technicalDetails?: any;
+  public readonly timestamp: Date;
+  public readonly recoverable: boolean;
+  public readonly suggestions: string[];
 
   constructor(
     code: keyof typeof ERROR_CODES,
@@ -91,16 +91,17 @@ export class AppException extends Error {
     recoverable: boolean = true,
     suggestions: string[] = []
   ) {
-    const defaultMessage = ERROR_MESSAGES[ERROR_CODES[code]] || message || '未知错误'
-    super(defaultMessage)
+    const defaultMessage =
+      ERROR_MESSAGES[ERROR_CODES[code]] || message || '未知错误';
+    super(defaultMessage);
 
-    this.name = 'AppException'
-    this.code = ERROR_CODES[code]
-    this.userMessage = defaultMessage
-    this.technicalDetails = technicalDetails
-    this.timestamp = new Date()
-    this.recoverable = recoverable
-    this.suggestions = suggestions
+    this.name = 'AppException';
+    this.code = ERROR_CODES[code];
+    this.userMessage = defaultMessage;
+    this.technicalDetails = technicalDetails;
+    this.timestamp = new Date();
+    this.recoverable = recoverable;
+    this.suggestions = suggestions;
   }
 
   toJSON(): AppError {
@@ -108,47 +109,47 @@ export class AppException extends Error {
       code: this.code,
       message: this.userMessage,
       details: this.technicalDetails,
-      timestamp: this.timestamp
-    }
+      timestamp: this.timestamp,
+    };
   }
 
   // 静态工厂方法
   static networkError(details?: any): AppException {
-    return new AppException(
-      'NETWORK_ERROR',
-      undefined,
-      details,
-      true,
-      ['检查网络连接', '确认服务器地址正确', '稍后重试']
-    )
+    return new AppException('NETWORK_ERROR', undefined, details, true, [
+      '检查网络连接',
+      '确认服务器地址正确',
+      '稍后重试',
+    ]);
   }
 
   static configError(message?: string, details?: any): AppException {
-    return new AppException(
-      'INVALID_CONFIG',
-      message,
-      details,
-      true,
-      ['检查配置信息', '确认API密钥有效', '验证服务器地址']
-    )
+    return new AppException('INVALID_CONFIG', message, details, true, [
+      '检查配置信息',
+      '确认API密钥有效',
+      '验证服务器地址',
+    ]);
   }
 
-  static apiError(message?: string, statusCode?: number, details?: any): AppException {
-    let code: keyof typeof ERROR_CODES = 'API_ERROR'
+  static apiError(
+    message?: string,
+    statusCode?: number,
+    details?: any
+  ): AppException {
+    let code: keyof typeof ERROR_CODES = 'API_ERROR';
 
-    if (statusCode === 401) code = 'UNAUTHORIZED'
-    else if (statusCode === 403) code = 'FORBIDDEN'
-    else if (statusCode === 429) code = 'RATE_LIMIT_EXCEEDED'
+    if (statusCode === 401) code = 'UNAUTHORIZED';
+    else if (statusCode === 403) code = 'FORBIDDEN';
+    else if (statusCode === 429) code = 'RATE_LIMIT_EXCEEDED';
 
     return new AppException(
       code,
       message,
       details,
       statusCode !== 401,
-      statusCode === 401 ?
-        ['检查API密钥', '确认账户状态', '重新生成密钥'] :
-        ['稍后重试', '检查配额限制', '联系支持']
-    )
+      statusCode === 401
+        ? ['检查API密钥', '确认账户状态', '重新生成密钥']
+        : ['稍后重试', '检查配额限制', '联系支持']
+    );
   }
 
   static diagramError(message?: string, details?: any): AppException {
@@ -158,60 +159,56 @@ export class AppException extends Error {
       details,
       true,
       ['简化输入描述', '检查网络连接', '尝试不同的表述方式']
-    )
+    );
   }
 
   static storageError(message?: string, details?: any): AppException {
-    return new AppException(
-      'STORAGE_ERROR',
-      message,
-      details,
-      true,
-      ['清理浏览器数据', '检查存储权限', '使用无痕模式重试']
-    )
+    return new AppException('STORAGE_ERROR', message, details, true, [
+      '清理浏览器数据',
+      '检查存储权限',
+      '使用无痕模式重试',
+    ]);
   }
 }
 
 // 错误处理工具类
 export class ErrorHandler {
-  private static errorHistory: AppException[] = []
-  private static maxHistorySize = 100
+  private static errorHistory: AppException[] = [];
+  private static maxHistorySize = 100;
 
   // 处理错误
   static handle(error: unknown, context?: string): AppException {
-    let appException: AppException
+    let appException: AppException;
 
     if (error instanceof AppException) {
-      appException = error
+      appException = error;
     } else if (error instanceof Error) {
-      appException = new AppException(
-        'UNKNOWN_ERROR',
-        error.message,
-        { originalError: error, context }
-      )
+      appException = new AppException('UNKNOWN_ERROR', error.message, {
+        originalError: error,
+        context,
+      });
     } else {
-      appException = new AppException(
-        'UNKNOWN_ERROR',
-        '未知错误',
-        { originalError: error, context }
-      )
+      appException = new AppException('UNKNOWN_ERROR', '未知错误', {
+        originalError: error,
+        context,
+      });
     }
 
     // 记录错误
-    this.recordError(appException)
+    this.recordError(appException);
 
     // 发送到错误报告服务（可选）
-    this.reportError(appException)
+    this.reportError(appException);
 
-    return appException
+    return appException;
   }
 
   // 记录错误
   private static recordError(error: AppException): void {
-    this.errorHistory.unshift(error)
+    this.errorHistory.unshift(error);
 
     if (this.errorHistory.length > this.maxHistorySize) {
-      this.errorHistory = this.errorHistory.slice(0, this.maxHistorySize)
+      this.errorHistory = this.errorHistory.slice(0, this.maxHistorySize);
     }
 
     // 控制台输出
@@ -219,14 +216,17 @@ export class ErrorHandler {
       code: error.code,
       message: error.userMessage,
       timestamp: error.timestamp,
-      details: error.technicalDetails
-    })
+      details: error.technicalDetails,
+    });
   }
 
   // 错误报告（可以集成第三方服务）
   private static reportError(_error: AppException): void {
     // 这里可以集成Sentry、LogRocket等错误监控服务
-    if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
+    if (
+      typeof process !== 'undefined' &&
+      process.env?.NODE_ENV === 'production'
+    ) {
       // 发送错误到监控服务
       // errorReportingService.captureException(error)
     }
@@ -234,45 +234,65 @@ export class ErrorHandler {
 
   // 获取错误历史
   static getErrorHistory(): AppException[] {
-    return [...this.errorHistory]
+    return [...this.errorHistory];
   }
 
   // 清除错误历史
   static clearErrorHistory(): void {
-    this.errorHistory = []
+    this.errorHistory = [];
   }
 
   // 获取用户友好的错误信息
   static getUserMessage(error: AppException): string {
-    return `${error.userMessage}${error.suggestions.length > 0 ? '\n\n建议：\n' + error.suggestions.map(s => `• ${s}`).join('\n') : ''}`
+    return `${error.userMessage}${error.suggestions.length > 0 ? '\n\n建议：\n' + error.suggestions.map((s) => `• ${s}`).join('\n') : ''}`;
   }
 
   // 检查错误是否可恢复
   static isRecoverable(error: AppException): boolean {
-    return error.recoverable
+    return error.recoverable;
   }
 
   // 获取重试建议
   static getRetryStrategy(error: AppException): {
-    shouldRetry: boolean
-    maxRetries: number
-    delay: number
-    backoffMultiplier: number
+    shouldRetry: boolean;
+    maxRetries: number;
+    delay: number;
+    backoffMultiplier: number;
   } {
     switch (error.code) {
       case ERROR_CODES.NETWORK_ERROR:
       case ERROR_CODES.TIMEOUT_ERROR:
-        return { shouldRetry: true, maxRetries: 3, delay: 1000, backoffMultiplier: 2 }
+        return {
+          shouldRetry: true,
+          maxRetries: 3,
+          delay: 1000,
+          backoffMultiplier: 2,
+        };
 
       case ERROR_CODES.RATE_LIMIT_EXCEEDED:
-        return { shouldRetry: true, maxRetries: 2, delay: 5000, backoffMultiplier: 1 }
+        return {
+          shouldRetry: true,
+          maxRetries: 2,
+          delay: 5000,
+          backoffMultiplier: 1,
+        };
 
       case ERROR_CODES.UNAUTHORIZED:
       case ERROR_CODES.FORBIDDEN:
-        return { shouldRetry: false, maxRetries: 0, delay: 0, backoffMultiplier: 1 }
+        return {
+          shouldRetry: false,
+          maxRetries: 0,
+          delay: 0,
+          backoffMultiplier: 1,
+        };
 
       default:
-        return { shouldRetry: true, maxRetries: 1, delay: 2000, backoffMultiplier: 1 }
+        return {
+          shouldRetry: true,
+          maxRetries: 1,
+          delay: 2000,
+          backoffMultiplier: 1,
+        };
     }
   }
 }
@@ -286,27 +306,27 @@ export class RetryHandler {
     delay: number = 1000,
     backoffMultiplier: number = 2
   ): Promise<T> {
-    let lastError: AppException
+    let lastError: AppException;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        return await operation()
+        return await operation();
       } catch (err) {
-        lastError = ErrorHandler.handle(err)
+        lastError = ErrorHandler.handle(err);
 
         if (attempt === maxRetries || !ErrorHandler.isRecoverable(lastError)) {
-          throw lastError
+          throw lastError;
         }
 
-        const waitTime = delay * Math.pow(backoffMultiplier, attempt)
-        await new Promise(resolve => setTimeout(resolve, waitTime))
+        const waitTime = delay * Math.pow(backoffMultiplier, attempt);
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
 
-    throw lastError!
+    throw lastError!;
   }
 }
 
 // 导出便捷方法
-export const handleError = ErrorHandler.handle
-export const getUserErrorMessage = ErrorHandler.getUserMessage
+export const handleError = ErrorHandler.handle;
+export const getUserErrorMessage = ErrorHandler.getUserMessage;

@@ -11,14 +11,18 @@
           <div class="step-number">1</div>
           <div class="step-content">
             <h4>配置LLM连接</h4>
-            <p>在应用顶部配置您的LLM API地址和密钥，支持OpenAI API格式的服务。</p>
+            <p>
+              在应用顶部配置您的LLM API地址和密钥，支持OpenAI API格式的服务。
+            </p>
           </div>
         </div>
         <div class="step-item">
           <div class="step-number">2</div>
           <div class="step-content">
             <h4>测试连接</h4>
-            <p>点击"测试连接"按钮确保配置正确，连接成功后状态会显示为"已连接"。</p>
+            <p>
+              点击"测试连接"按钮确保配置正确，连接成功后状态会显示为"已连接"。
+            </p>
           </div>
         </div>
         <div class="step-item">
@@ -82,25 +86,29 @@
         <div class="tip-item">
           <el-icon class="tip-icon"><CaretRight /></el-icon>
           <div class="tip-content">
-            <strong>描述越详细越好：</strong>包含系统的组件、数据流向、技术栈等信息，能生成更准确的图表。
+            <strong>描述越详细越好：</strong
+            >包含系统的组件、数据流向、技术栈等信息，能生成更准确的图表。
           </div>
         </div>
         <div class="tip-item">
           <el-icon class="tip-icon"><CaretRight /></el-icon>
           <div class="tip-content">
-            <strong>使用标准术语：</strong>如"前端"、"后端"、"数据库"、"API网关"等，有助于AI更好地理解。
+            <strong>使用标准术语：</strong
+            >如"前端"、"后端"、"数据库"、"API网关"等，有助于AI更好地理解。
           </div>
         </div>
         <div class="tip-item">
           <el-icon class="tip-icon"><CaretRight /></el-icon>
           <div class="tip-content">
-            <strong>指定图表类型：</strong>如需要特定类型的图表，可以在描述中明确指出。
+            <strong>指定图表类型：</strong
+            >如需要特定类型的图表，可以在描述中明确指出。
           </div>
         </div>
         <div class="tip-item">
           <el-icon class="tip-icon"><CaretRight /></el-icon>
           <div class="tip-content">
-            <strong>利用预设模板：</strong>使用输入建议中的模板，快速生成常见架构模式。
+            <strong>利用预设模板：</strong
+            >使用输入建议中的模板，快速生成常见架构模式。
           </div>
         </div>
       </div>
@@ -118,22 +126,17 @@
           <div class="example-code">
             创建一个微服务架构，包含API网关、用户服务、订单服务、支付服务、通知服务，使用Redis作为缓存，RabbitMQ作为消息队列，PostgreSQL作为主数据库。
           </div>
-          <el-button
-            size="small"
-            @click="useExample('微服务架构示例')"
-          >
+          <el-button size="small" @click="useExample('微服务架构示例')">
             使用此示例
           </el-button>
         </div>
         <div class="example-item">
           <h4>Web应用</h4>
           <div class="example-code">
-            设计一个三层Web应用架构，前端使用Vue.js，后端使用Node.js + Express，数据库使用MongoDB，Nginx作为反向代理，支持水平扩展。
+            设计一个三层Web应用架构，前端使用Vue.js，后端使用Node.js +
+            Express，数据库使用MongoDB，Nginx作为反向代理，支持水平扩展。
           </div>
-          <el-button
-            size="small"
-            @click="useExample('Web应用架构示例')"
-          >
+          <el-button size="small" @click="useExample('Web应用架构示例')">
             使用此示例
           </el-button>
         </div>
@@ -142,10 +145,7 @@
           <div class="example-code">
             构建大数据处理平台，包含数据采集层、数据存储层(HDFS)、数据处理层(Spark)、数据服务层，以及数据可视化前端。
           </div>
-          <el-button
-            size="small"
-            @click="useExample('大数据平台示例')"
-          >
+          <el-button size="small" @click="useExample('大数据平台示例')">
             使用此示例
           </el-button>
         </div>
@@ -246,8 +246,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
 import {
   Magic,
   Star,
@@ -259,16 +259,16 @@ import {
   CaretRight,
   Message,
   ChatDotRound,
-  Position
-} from '@element-plus/icons-vue'
+  Position,
+} from '@element-plus/icons-vue';
 
 // Emits
 interface Emits {
-  (e: 'close'): void
-  (e: 'use-example', example: string): void
+  (e: 'close'): void;
+  (e: 'use-example', example: string): void;
 }
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
 // 快捷键数据
 const shortcutData = ref([
@@ -280,25 +280,28 @@ const shortcutData = ref([
   { key: 'Ctrl + Z', description: '撤销操作' },
   { key: 'Ctrl + Y', description: '重做操作' },
   { key: 'F1', description: '显示帮助' },
-  { key: 'Escape', description: '关闭对话框' }
-])
+  { key: 'Escape', description: '关闭对话框' },
+]);
 
 // 示例文本
 const exampleTexts: Record<string, string> = {
-  '微服务架构示例': '创建一个微服务架构，包含API网关、用户服务、订单服务、支付服务、通知服务，使用Redis作为缓存，RabbitMQ作为消息队列，PostgreSQL作为主数据库。',
-  'Web应用架构示例': '设计一个三层Web应用架构，前端使用Vue.js，后端使用Node.js + Express，数据库使用MongoDB，Nginx作为反向代理，支持水平扩展。',
-  '大数据平台示例': '构建大数据处理平台，包含数据采集层、数据存储层(HDFS)、数据处理层(Spark)、数据服务层，以及数据可视化前端。'
-}
+  微服务架构示例:
+    '创建一个微服务架构，包含API网关、用户服务、订单服务、支付服务、通知服务，使用Redis作为缓存，RabbitMQ作为消息队列，PostgreSQL作为主数据库。',
+  Web应用架构示例:
+    '设计一个三层Web应用架构，前端使用Vue.js，后端使用Node.js + Express，数据库使用MongoDB，Nginx作为反向代理，支持水平扩展。',
+  大数据平台示例:
+    '构建大数据处理平台，包含数据采集层、数据存储层(HDFS)、数据处理层(Spark)、数据服务层，以及数据可视化前端。',
+};
 
 // 方法
 const useExample = (exampleKey: string) => {
-  const text = exampleTexts[exampleKey]
+  const text = exampleTexts[exampleKey];
   if (text) {
-    emit('use-example', text)
-    emit('close')
-    ElMessage.success('示例已应用到输入框')
+    emit('use-example', text);
+    emit('close');
+    ElMessage.success('示例已应用到输入框');
   }
-}
+};
 </script>
 
 <style scoped>

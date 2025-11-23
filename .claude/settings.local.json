@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git fetch:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Skill(vue-dev-guidelines)"
     ],
     "deny": [],
     "ask": []

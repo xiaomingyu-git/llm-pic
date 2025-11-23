@@ -10,7 +10,12 @@
       </div>
     </template>
 
-    <el-form :model="inputData" :rules="formRules" ref="formRef" label-width="80px">
+    <el-form
+      :model="inputData"
+      :rules="formRules"
+      ref="formRef"
+      label-width="80px"
+    >
       <el-form-item label="描述" prop="description">
         <el-input
           v-model="inputData.description"
@@ -77,157 +82,157 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
-import { ElMessage, FormInstance } from 'element-plus'
-import { CircleCheck, Magic, Delete } from '@element-plus/icons-vue'
+import { ref, reactive, computed, watch } from 'vue';
+import { ElMessage, FormInstance } from 'element-plus';
+import { CircleCheck, Magic, Delete } from '@element-plus/icons-vue';
 
 // 类型定义
 interface InputData {
-  description: string
+  description: string;
 }
 
 interface Suggestion {
-  title: string
-  text: string
+  title: string;
+  text: string;
 }
 
 // Props
 interface Props {
-  isGenerating?: boolean
-  isConnected?: boolean
+  isGenerating?: boolean;
+  isConnected?: boolean;
 }
 
 // Emits
 interface Emits {
-  (e: 'generate-diagram', description: string): void
-  (e: 'clear-diagram'): void
+  (e: 'generate-diagram', description: string): void;
+  (e: 'clear-diagram'): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isGenerating: false,
-  isConnected: false
-})
+  isConnected: false,
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
 // 响应式数据
 const inputData = reactive<InputData>({
-  description: ''
-})
+  description: '',
+});
 
-const showSuggestions = ref(false)
-const formRef = ref<FormInstance>()
+const showSuggestions = ref(false);
+const formRef = ref<FormInstance>();
 
 // 输入建议数据
 const suggestions: Suggestion[] = [
   {
     title: 'Web应用',
-    text: '创建一个三层Web应用架构，包括前端React应用、后端Node.js API服务器、PostgreSQL数据库，以及Nginx反向代理'
+    text: '创建一个三层Web应用架构，包括前端React应用、后端Node.js API服务器、PostgreSQL数据库，以及Nginx反向代理',
   },
   {
     title: '微服务',
-    text: '设计微服务架构，包含API网关、用户服务、订单服务、支付服务、通知服务，以及Redis缓存和消息队列'
+    text: '设计微服务架构，包含API网关、用户服务、订单服务、支付服务、通知服务，以及Redis缓存和消息队列',
   },
   {
     title: '电商平台',
-    text: '电商平台架构，前端Vue应用、用户认证服务、商品服务、订单服务、库存服务、支付系统、搜索系统'
+    text: '电商平台架构，前端Vue应用、用户认证服务、商品服务、订单服务、库存服务、支付系统、搜索系统',
   },
   {
     title: '数据分析',
-    text: '大数据分析平台，包含数据采集、ETL处理、数据仓库Hadoop、分析引擎Spark、可视化仪表盘'
+    text: '大数据分析平台，包含数据采集、ETL处理、数据仓库Hadoop、分析引擎Spark、可视化仪表盘',
   },
   {
     title: '容器化',
-    text: 'Kubernetes集群部署的应用，包含前端容器、后端容器、数据库容器、负载均衡器和自动伸缩'
-  }
-]
+    text: 'Kubernetes集群部署的应用，包含前端容器、后端容器、数据库容器、负载均衡器和自动伸缩',
+  },
+];
 
 // 表单验证规则
 const formRules = {
   description: [
     { required: true, message: '请输入架构描述', trigger: 'blur' },
-    { min: 10, message: '描述至少需要10个字符', trigger: 'blur' }
-  ]
-}
+    { min: 10, message: '描述至少需要10个字符', trigger: 'blur' },
+  ],
+};
 
 // 计算属性
 const isValidInput = computed(() => {
-  return inputData.description.trim().length >= 10
-})
+  return inputData.description.trim().length >= 10;
+});
 
 // 方法
 const handleInput = () => {
   // 实时验证
   if (formRef.value) {
-    formRef.value.validateField('description')
+    formRef.value.validateField('description');
   }
-}
+};
 
 const handleSubmit = async () => {
   if (!isValidInput.value) {
-    ElMessage.warning('请输入有效的架构描述（至少10个字符）')
-    return
+    ElMessage.warning('请输入有效的架构描述（至少10个字符）');
+    return;
   }
 
   if (!props.isConnected) {
-    ElMessage.warning('请先配置并连接LLM服务')
-    return
+    ElMessage.warning('请先配置并连接LLM服务');
+    return;
   }
 
   try {
-    await formRef.value?.validate()
-    emit('generate-diagram', inputData.description.trim())
+    await formRef.value?.validate();
+    emit('generate-diagram', inputData.description.trim());
   } catch (error) {
-    ElMessage.error('输入验证失败')
+    ElMessage.error('输入验证失败');
   }
-}
+};
 
 const handleClear = () => {
-  inputData.description = ''
+  inputData.description = '';
   if (formRef.value) {
-    formRef.value.clearValidate()
+    formRef.value.clearValidate();
   }
-  emit('clear-diagram')
-  ElMessage.info('已清空输入')
-}
+  emit('clear-diagram');
+  ElMessage.info('已清空输入');
+};
 
 const applySuggestion = (text: string) => {
-  inputData.description = text
-  showSuggestions.value = false
-  handleInput()
-  ElMessage.success('已应用建议模板')
-}
+  inputData.description = text;
+  showSuggestions.value = false;
+  handleInput();
+  ElMessage.success('已应用建议模板');
+};
 
 // 键盘快捷键支持
 const handleKeyboardShortcut = (event: KeyboardEvent) => {
   // Ctrl+Enter 或 Cmd+Enter 提交
   if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-    event.preventDefault()
-    handleSubmit()
+    event.preventDefault();
+    handleSubmit();
   }
 
   // Escape 清空
   if (event.key === 'Escape') {
-    event.preventDefault()
-    handleClear()
+    event.preventDefault();
+    handleClear();
   }
-}
+};
 
 // 监听键盘事件
 watch(
   () => inputData.description,
   () => {
     // 输入时添加键盘事件监听
-    document.addEventListener('keydown', handleKeyboardShortcut)
+    document.addEventListener('keydown', handleKeyboardShortcut);
   },
   { immediate: true }
-)
+);
 
 // 组件卸载时清理
-import { onUnmounted } from 'vue'
+import { onUnmounted } from 'vue';
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeyboardShortcut)
-})
+  document.removeEventListener('keydown', handleKeyboardShortcut);
+});
 </script>
 
 <style scoped>
