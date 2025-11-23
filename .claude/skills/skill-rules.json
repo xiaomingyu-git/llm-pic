@@ -1,12 +1,52 @@
 {
   "version": "1.0",
   "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
+  "mcpPermissions": {
+    "enableAllProjectMcpServers": true,
+    "allowedTools": [
+      "Edit:*",
+      "Write:*",
+      "MultiEdit:*",
+      "NotebookEdit:*",
+      "Bash:*",
+      "Task:*",
+      "Glob:*",
+      "Grep:*",
+      "Read:*",
+      "WebFetch:*",
+      "WebSearch:*",
+      "ExitPlanMode:*",
+      "AskUserQuestion:*",
+      "TodoWrite:*",
+      "mcp__acp__Read:*",
+      "mcp__acp__Write:*",
+      "mcp__acp__Edit:*",
+      "mcp__acp__Bash:*",
+      "mcp__acp__BashOutput:*",
+      "mcp__acp__KillShell:*",
+      "mcp__context7__resolve-library-id:*",
+      "mcp__context7__get-library-docs:*",
+      "mcp__playwright__browser_*",
+      "mcp__web-reader__webReader:*",
+      "mcp__web-search-prime__webSearchPrime:*"
+    ],
+    "defaultMode": "acceptEdits"
+  },
   "skills": {
     "skill-developer": {
       "type": "domain",
       "enforcement": "suggest",
       "priority": "high",
       "description": "Meta-skill for creating and managing Claude Code skills",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "TodoWrite",
+        "Glob",
+        "Grep"
+      ],
       "promptTriggers": {
         "keywords": [
           "skill system",
@@ -40,6 +80,20 @@
       "enforcement": "suggest",
       "priority": "high",
       "description": "Backend development patterns for Node.js/Express/TypeScript",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "mcp__acp__BashOutput",
+        "Glob",
+        "Grep",
+        "Task",
+        "ExitPlanMode",
+        "TodoWrite",
+        "mcp__context7__resolve-library-id",
+        "mcp__context7__get-library-docs"
+      ],
       "promptTriggers": {
         "keywords": [
           "backend",
@@ -117,6 +171,19 @@
       "enforcement": "block",
       "priority": "high",
       "description": "React/TypeScript best practices including MUI v7 compatibility",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TodoWrite",
+        "mcp__context7__resolve-library-id",
+        "mcp__context7__get-library-docs",
+        "mcp__playwright__browser_*"
+      ],
       "promptTriggers": {
         "keywords": [
           "component",
@@ -193,6 +260,21 @@
       "enforcement": "block",
       "priority": "high",
       "description": "Vue 3 + TypeScript + Element Plus best practices",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TodoWrite",
+        "mcp__context7__resolve-library-id",
+        "mcp__context7__get-library-docs",
+        "mcp__playwright__browser_*",
+        "WebFetch",
+        "WebSearch"
+      ],
       "promptTriggers": {
         "keywords": [
           "vue component",
@@ -274,6 +356,14 @@
       "enforcement": "suggest",
       "priority": "high",
       "description": "Testing authenticated API routes with JWT cookie-based auth",
+      "mcpTools": [
+        "mcp__acp__Bash",
+        "mcp__acp__BashOutput",
+        "mcp__acp__KillShell",
+        "mcp__acp__Read",
+        "TodoWrite",
+        "Task"
+      ],
       "promptTriggers": {
         "keywords": [
           "test route",
@@ -321,6 +411,17 @@
       "enforcement": "suggest",
       "priority": "high",
       "description": "Sentry error tracking and performance monitoring patterns",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "mcp__context7__resolve-library-id",
+        "mcp__context7__get-library-docs"
+      ],
       "promptTriggers": {
         "keywords": [
           "error handling",
@@ -377,6 +478,50 @@
       "pathPatterns": "Adjust to match your project structure (blog-api, auth-service, etc.)",
       "keywords": "Add domain-specific terms relevant to your project",
       "intentPatterns": "Use regex for flexible user intent matching"
+    },
+    "mcpIntegration": {
+      "description": "MCP tools are now integrated with skills for enhanced functionality",
+      "mcpPermissions": "Global MCP permissions configuration for all skills",
+      "skillMcpTools": "Each skill has specific MCP tools it can access",
+      "toolMapping": {
+        "skill-developer": [
+          "File operations",
+          "Task management",
+          "Project search"
+        ],
+        "backend-dev-guidelines": [
+          "File operations",
+          "Code search",
+          "Library documentation",
+          "Task planning"
+        ],
+        "frontend-dev-guidelines": [
+          "File operations",
+          "Code search",
+          "Library documentation",
+          "Browser testing"
+        ],
+        "vue-dev-guidelines": [
+          "File operations",
+          "Code search",
+          "Library documentation",
+          "Browser testing",
+          "Web research"
+        ],
+        "route-tester": [
+          "Command execution",
+          "Process management",
+          "File reading",
+          "Task tracking"
+        ],
+        "error-tracking": [
+          "File operations",
+          "Code search",
+          "Library documentation",
+          "Task management"
+        ]
+      },
+      "automaticActivation": "Skills can now automatically call MCP tools when activated"
     }
   }
 }

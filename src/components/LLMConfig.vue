@@ -3,7 +3,7 @@
         <template #header>
             <div class="card-header">
                 <span>LLM 配置</span>
-                <ConnectionStatus :status="connectionStatus" />
+                <ConnectionStatus :config="config" :status="connectionStatus" />
             </div>
         </template>
 
@@ -30,11 +30,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { ElMessage, FormInstance } from 'element-plus';
 import ConnectionStatus from './ConnectionStatus.vue';
-import { validateApiKey } from '../utils/validation';
-import { saveConfiguration, loadConfiguration } from '../services/storage';
+import { ValidationService } from '../utils/validation';
 import { testConnection } from '../services/llmService';
 
 // 类型定义
@@ -76,7 +75,7 @@ const formRules = {
         { required: true, message: '请输入API Key', trigger: 'blur' },
         {
             validator: (rule: any, value: string, callback: Function) => {
-                if (value && !validateApiKey(value)) {
+                if (value && !ValidationService.isValidApiKey(value)) {
                     callback(new Error('API Key格式不正确'));
                 } else {
                     callback();
@@ -100,23 +99,16 @@ const validateForm = async () => {
 };
 
 const loadConfig = () => {
-    try {
-        const saved = loadConfiguration();
-        if (saved) {
-            Object.assign(config, saved);
-        }
-    } catch (error) {
-        console.error('加载配置失败:', error);
-        ElMessage.warning('加载本地配置失败');
-    }
+    // 不加载任何配置，使用默认值
+    console.log('使用默认配置（页面临时数据）');
 };
 
 const handleSaveConfig = async () => {
     try {
         await validateForm();
-        saveConfiguration(config);
+        // 不保存配置，只显示消息
         emit('config-saved', { ...config });
-        ElMessage.success('配置已保存');
+        ElMessage.success('配置已保存（页面临时数据）');
     } catch (error) {
         ElMessage.error('配置保存失败');
     }
@@ -162,21 +154,7 @@ const handleTestConnection = async () => {
     }
 };
 
-// 监听配置变化，自动保存
-watch(
-    () => config,
-    (newConfig) => {
-        if (newConfig.url || newConfig.apiKey) {
-            // 防抖保存
-            setTimeout(() => {
-                if (newConfig.url || newConfig.apiKey) {
-                    saveConfiguration(newConfig);
-                }
-            }, 1000);
-        }
-    },
-    { deep: true }
-);
+// 配置变化监听器已移除 - 不需要自动保存功能
 
 // 组件初始化
 loadConfig();

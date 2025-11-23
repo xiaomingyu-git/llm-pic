@@ -4,8 +4,6 @@ dist-ssr/
 coverage/
 
 # 忽略配置文件
-*.config.js
-*.config.ts
 
 # 忽略环境类型定义
 env.d.ts

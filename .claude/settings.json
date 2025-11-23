@@ -6,9 +6,62 @@
       "Write:*",
       "MultiEdit:*",
       "NotebookEdit:*",
-      "Bash:*"
+      "Bash:*",
+      "Task:*",
+      "Skill:*",
+      "Glob:*",
+      "Grep:*",
+      "Read:*",
+      "WebFetch:*",
+      "WebSearch:*",
+      "ExitPlanMode:*",
+      "AskUserQuestion:*",
+      "TodoWrite:*",
+      "mcp__acp__Read:*",
+      "mcp__acp__Write:*",
+      "mcp__acp__Edit:*",
+      "mcp__acp__Bash:*",
+      "mcp__acp__BashOutput:*",
+      "mcp__acp__KillShell:*",
+      "mcp__zai-mcp-server__analyze_image:*",
+      "mcp__zai-mcp-server__analyze_video:*",
+      "mcp__playwright__browser_*",
+      "mcp__web-reader__webReader:*",
+      "mcp__web-search-prime__webSearchPrime:*",
+      "mcp__context7__resolve-library-id:*",
+      "mcp__context7__get-library-docs:*"
     ],
     "defaultMode": "acceptEdits"
+  },
+  "mcpServers": {
+    "acp": {
+      "command": "npx.cmd",
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "."
+      ],
+      "env": {
+        "FILESYSTEM_ROOT": "."
+      }
+    },
+    "context7": {
+      "command": "npx.cmd",
+      "args": [
+        "@context7/mcp"
+      ]
+    },
+    "playwright": {
+      "command": "npx.cmd",
+      "args": [
+        "@playwright/mcp"
+      ]
+    },
+    "web-search-prime": {
+      "command": "npx.cmd",
+      "args": [
+        "@web-search-prime/mcp"
+      ]
+    }
   },
   "hooks": {
     "UserPromptSubmit": [

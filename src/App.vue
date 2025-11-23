@@ -103,22 +103,28 @@
                                 </div>
                             </template>
 
-                            <el-radio-group v-model="selectedFormat" @change="onFormatChange">
-                                <el-radio-button label="mermaid">Mermaid 图表</el-radio-button>
-                                <el-radio-button label="xml">XML 架构图</el-radio-button>
-                            </el-radio-group>
+                            <div class="format-buttons">
+                                <el-button type="primary" :class="{ 'is-active': selectedFormat === 'mermaid' }"
+                                    @click="() => { console.log('Mermaid按钮被点击'); onFormatChange('mermaid'); }">
+                                    Mermaid 图表
+                                </el-button>
+                                <el-button type="primary" :class="{ 'is-active': selectedFormat === 'xml' }"
+                                    @click="() => { console.log('XML按钮被点击'); onFormatChange('xml'); }">
+                                    XML 架构图
+                                </el-button>
+                            </div>
                         </el-card>
                     </div>
 
                     <!-- 图表生成组件区域 -->
                     <div class="diagram-component-section">
-                        <!-- Mermaid 组件 -->
-                        <MermaidDiagram v-show="selectedFormat === 'mermaid'" :config="config"
+                        <!-- Mermaid 图表组件 -->
+                        <MermaidDiagram v-if="selectedFormat === 'mermaid'" :config="config"
                             :selected-model="selectedModel" :is-form-valid="isFormValid" />
 
-                        <!-- XML 组件 -->
-                        <XMLDiagram v-show="selectedFormat === 'xml'" :config="config" :selected-model="selectedModel"
-                            :is-form-valid="isFormValid" />
+                        <!-- XML 架构图组件 -->
+                        <XMLDiagram v-else-if="selectedFormat === 'xml'" :config="config"
+                            :selected-model="selectedModel" :is-form-valid="isFormValid" />
                     </div>
                 </div>
             </el-main>
@@ -138,7 +144,7 @@ import {
 import ConnectionStatus from './components/ConnectionStatus.vue';
 import MermaidDiagram from './components/MermaidDiagram.vue';
 import XMLDiagram from './components/XMLDiagram.vue';
-import { StorageService } from './services/storage';
+// Storage 功能已移除 - 不使用持久化存储
 import type { ConnectionDetails } from './types';
 
 // 响应式数据
@@ -196,7 +202,8 @@ const loadConfig = () => {
 
 const saveConfig = () => {
     try {
-        StorageService.saveConfiguration(config);
+        // 不保存配置，仅显示消息
+        console.log('配置未保存（页面临时数据）');
         ElMessage.info('配置仅在当前页面有效');
     } catch (error) {
         console.error('保存配置失败:', error);
@@ -352,7 +359,36 @@ const handleModelChange = (modelId: string) => {
 
 // 格式切换处理
 const onFormatChange = (format: 'mermaid' | 'xml') => {
-    console.log(`切换到 ${format} 格式`);
+    try {
+        console.log(`开始切换格式 - 原值: ${selectedFormat.value}`, '新值:', format);
+
+        // 检查事件是否正常触发
+        console.log('onFormatChange 事件被触发，参数:', format);
+
+        // 检查是否是有效格式
+        if (format !== 'mermaid' && format !== 'xml') {
+            console.error('无效的格式:', format);
+            ElMessage.error('无效的图表格式');
+            return;
+        }
+
+        console.log('设置新值:', format);
+        selectedFormat.value = format;
+
+        // 强制触发响应式更新
+        console.log('更新后的 selectedFormat:', selectedFormat.value);
+
+        ElMessage.success(`已切换到 ${format} 格式`);
+
+        // 添加延迟验证
+        setTimeout(() => {
+            console.log('延迟验证 - 当前 selectedFormat:', selectedFormat.value);
+        }, 100);
+
+    } catch (error) {
+        console.error('格式切换过程中发生错误:', error);
+        ElMessage.error('格式切换失败');
+    }
 };
 
 // 动态模型分类和排序 - 基于API返回的内容
@@ -484,6 +520,31 @@ onMounted(() => {
 }
 
 /* 格式选择样式 */
+.format-buttons {
+    display: flex;
+    gap: 16px;
+}
+
+.format-buttons .el-button {
+    flex: 1;
+}
+
+.format-buttons .el-button.is-active {
+    background-color: var(--el-color-primary);
+    border-color: var(--el-color-primary);
+    color: white;
+}
+
+.format-buttons .el-button:not(.is-active) {
+    background-color: transparent;
+    border-color: var(--el-color-primary);
+    color: var(--el-color-primary);
+}
+
+.format-buttons .el-button:not(.is-active):hover {
+    background-color: var(--el-color-primary-light-9);
+}
+
 :deep(.el-radio-group) {
     display: flex;
     gap: 16px;
@@ -491,6 +552,17 @@ onMounted(() => {
 
 :deep(.el-radio-button) {
     margin-right: 0;
+}
+
+/* 组件加载状态样式 */
+.loading-component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+    color: var(--el-text-color-secondary);
 }
 
 /* 模型选择相关样式 */

@@ -247,7 +247,7 @@ import {
     Upload,
     Delete,
 } from '@element-plus/icons-vue';
-import { StorageService } from '../services/storage';
+// Storage 功能已移除 - 不使用持久化存储
 
 // Props
 interface Props {
@@ -433,7 +433,8 @@ const clearAllData = async () => {
             }
         );
 
-        StorageService.clearAllData();
+        // 无需清除数据，因为不使用持久化存储
+        console.log('数据清除（无数据需要清除）');
         Object.assign(localSettings, defaultSettings);
         emit('settings-change', { ...localSettings });
         ElMessage.success('所有数据已清除');
