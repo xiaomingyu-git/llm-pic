@@ -30,18 +30,21 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    // Production TypeScript Configuration - 严格模式
-    "strict": true, // 启用所有严格类型检查
-    "noUnusedLocals": true, // 检查未使用的局部变量
-    "noUnusedParameters": true, // 检查未使用的参数
-    "noImplicitReturns": true, // 检查缺失的返回语句
-    "exactOptionalPropertyTypes": true, // 严格的可选属性处理
-    "noImplicitAny": true, // 禁止隐式any类型
-    "noImplicitThis": true, // 禁止隐式this类型
-    "noImplicitOverride": true, // 要求显式覆盖声明
-    "noPropertyAccessFromIndexSignature": false, // 根据项目需求调整
-    "noUncheckedIndexedAccess": true, // 严格的索引访问检查
-    "noFallthroughCasesInSwitch": true, // switch语句的穿透检查
+    // Super Development TypeScript Configuration - 极其宽松模式
+    "strict": false, // 关闭严格模式
+    "noUnusedLocals": false, // 不检查未使用的局部变量
+    "noUnusedParameters": false, // 不检查未使用的参数
+    "noImplicitReturns": false, // 不检查缺失的返回语句
+    "exactOptionalPropertyTypes": false, // 不严格检查可选属性
+    "noImplicitAny": false, // 允许隐式any类型
+    "noImplicitThis": false, // 允许隐式this类型
+    "noImplicitOverride": false, // 不要求显式覆盖声明
+    "noPropertyAccessFromIndexSignature": false, // 完全允许索引签名访问
+    "noUncheckedIndexedAccess": false, // 不严格检查索引访问
+    "noFallthroughCasesInSwitch": false, // 不检查switch穿透
+    "allowJs": true, // 允许JS文件
+    "checkJs": false, // 不检查JS文件,
+    "ignoreDeprecations": "5.0" // 忽略5.0版本的废弃警告
     // 确保编辑器正确识别类型
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,

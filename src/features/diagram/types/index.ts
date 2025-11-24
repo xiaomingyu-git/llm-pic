@@ -114,6 +114,7 @@ export interface MockElement {
   textContent?: string;
   getElementsByTagName(tagName: string): MockElement[];
   querySelector(selector: string): MockElement | null;
+  querySelectorAll(selector: string): MockElement[];
   setAttribute(name: string, value: string): void;
   getAttribute(name: string): string | null | undefined;
 }
@@ -144,4 +145,5 @@ export interface DiagramGenerationOptions {
   includeDetails?: boolean;
   addIcons?: boolean;
   generateCode?: boolean;
+  customStyles?: any; // 允许自定义样式
 }
