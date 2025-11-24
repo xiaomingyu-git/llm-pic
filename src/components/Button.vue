@@ -24,7 +24,14 @@ import { ElButton } from 'element-plus';
 // TypeScript Interfaces
 interface Props {
   /** Button type */
-  type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'text' | 'default';
+  type?:
+    | 'primary'
+    | 'success'
+    | 'warning'
+    | 'danger'
+    | 'info'
+    | 'text'
+    | 'default';
   /** Button size */
   size?: 'large' | 'default' | 'small';
   /** Whether button is disabled */
@@ -63,7 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
   circle: false,
   autofocus: false,
   nativeType: 'button',
-  variant: 'default'
+  variant: 'default',
 });
 
 const emit = defineEmits<Emits>();

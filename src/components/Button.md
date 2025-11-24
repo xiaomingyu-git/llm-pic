@@ -27,25 +27,25 @@ import Button from '@/components/Button.vue';
 
 ### Props
 
-| 参数 | 说明 | 类型 | 可选值 | 默认值 |
-|------|------|------|--------|--------|
-| type | 按钮类型 | `string` | `primary`/`success`/`warning`/`danger`/`info`/`text`/`default` | default |
-| size | 按钮尺寸 | `string` | `large`/`default`/`small` | default |
-| disabled | 是否禁用 | `boolean` | — | false |
-| loading | 是否加载中 | `boolean` | — | false |
-| icon | 图标组件 | `object` | — | — |
-| plain | 是否朴素按钮 | `boolean` | — | false |
-| round | 是否圆角按钮 | `boolean` | — | false |
-| circle | 是否圆形按钮 | `boolean` | — | false |
-| autofocus | 是否默认聚焦 | `boolean` | — | false |
-| native-type | 原生 type 属性 | `string` | `button`/`submit`/`reset` | button |
-| variant | 视觉变体 | `string` | `default`/`outline`/`ghost`/`link` | default |
+| 参数        | 说明           | 类型      | 可选值                                                         | 默认值  |
+| ----------- | -------------- | --------- | -------------------------------------------------------------- | ------- |
+| type        | 按钮类型       | `string`  | `primary`/`success`/`warning`/`danger`/`info`/`text`/`default` | default |
+| size        | 按钮尺寸       | `string`  | `large`/`default`/`small`                                      | default |
+| disabled    | 是否禁用       | `boolean` | —                                                              | false   |
+| loading     | 是否加载中     | `boolean` | —                                                              | false   |
+| icon        | 图标组件       | `object`  | —                                                              | —       |
+| plain       | 是否朴素按钮   | `boolean` | —                                                              | false   |
+| round       | 是否圆角按钮   | `boolean` | —                                                              | false   |
+| circle      | 是否圆形按钮   | `boolean` | —                                                              | false   |
+| autofocus   | 是否默认聚焦   | `boolean` | —                                                              | false   |
+| native-type | 原生 type 属性 | `string`  | `button`/`submit`/`reset`                                      | button  |
+| variant     | 视觉变体       | `string`  | `default`/`outline`/`ghost`/`link`                             | default |
 
 ### Events
 
-| 事件名 | 说明 | 参数 |
-|--------|------|------|
-| click | 点击按钮时触发 | `event: MouseEvent` |
+| 事件名 | 说明           | 参数                |
+| ------ | -------------- | ------------------- |
+| click  | 点击按钮时触发 | `event: MouseEvent` |
 
 ## 示例
 
@@ -84,12 +84,12 @@ import Button from '@/components/Button.vue';
       <Button variant="outline">Outline按钮</Button>
       <Button type="primary" variant="outline">Primary Outline</Button>
     </div>
-    
+
     <div class="variant-group">
       <Button variant="ghost">Ghost按钮</Button>
       <Button type="success" variant="ghost">Success Ghost</Button>
     </div>
-    
+
     <div class="variant-group">
       <Button variant="link">链接样式</Button>
       <Button type="warning" variant="link">Warning链接</Button>
@@ -143,7 +143,7 @@ const handleSubmit = async () => {
   isLoading.value = true;
   try {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   } finally {
     isLoading.value = false;
   }
@@ -232,20 +232,12 @@ const actions: ButtonAction[] = [
 ```vue
 <template>
   <div class="conditional-buttons">
-    <Button
-      v-if="!isLoggedIn"
-      type="primary"
-      @click="handleLogin"
-    >
+    <Button v-if="!isLoggedIn" type="primary" @click="handleLogin">
       登录
     </Button>
-    
+
     <template v-else>
-      <Button
-        v-if="hasEditPermission"
-        :icon="Edit"
-        @click="handleEdit"
-      >
+      <Button v-if="hasEditPermission" :icon="Edit" @click="handleEdit">
         编辑
       </Button>
       <Button
@@ -267,22 +259,10 @@ const actions: ButtonAction[] = [
 <template>
   <div class="responsive-buttons">
     <!-- 桌面端显示文字按钮 -->
-    <Button
-      v-if="!isMobile"
-      type="primary"
-      :icon="Save"
-    >
-      保存文档
-    </Button>
-    
+    <Button v-if="!isMobile" type="primary" :icon="Save"> 保存文档 </Button>
+
     <!-- 移动端只显示图标 -->
-    <Button
-      v-else
-      type="primary"
-      :icon="Save"
-      circle
-      @click="handleSave"
-    />
+    <Button v-else type="primary" :icon="Save" circle @click="handleSave" />
   </div>
 </template>
 
@@ -320,7 +300,7 @@ onUnmounted(() => {
   --el-button-hover-border-color: #4f46e5;
   --el-button-active-bg-color: #4338ca;
   --el-button-active-border-color: #4338ca;
-  
+
   font-weight: 600;
   padding: 12px 24px;
   border-radius: 8px;
@@ -366,7 +346,7 @@ const testLoadingState = () => {
     <el-form-item label="用户名" prop="username">
       <el-input v-model="form.username" />
     </el-form-item>
-    
+
     <el-form-item>
       <Button native-type="submit" type="primary">登录</Button>
       <Button native-type="reset">重置</Button>
@@ -412,11 +392,7 @@ const handleConfirm = () => {
 
 ```vue
 <template>
-  <Button
-    aria-label="删除用户"
-    type="danger"
-    @click="handleDelete"
-  >
+  <Button aria-label="删除用户" type="danger" @click="handleDelete">
     删除
   </Button>
 </template>

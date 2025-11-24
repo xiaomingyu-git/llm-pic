@@ -42,9 +42,12 @@
 
         <!-- 加载状态 -->
         <div v-if="isLoading" class="loading-container">
-            <el-loading-spinner size="large" />
+            <el-icon class="loading-icon" size="32">
+                <Loading />
+            </el-icon>
             <p class="loading-text">正在生成架构图...</p>
-            <el-progress :percentage="loadingProgress" :status="loadingStatus" style="width: 300px; margin-top: 16px" />
+            <el-progress :percentage="loadingProgress" :status="loadingStatus"
+                :style="{ width: '300px', marginTop: '16px' }" />
         </div>
 
         <!-- 图表显示区域 -->
@@ -103,17 +106,17 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch } from 'vue';
-import { ElMessage } from 'element-plus';
 import {
     View,
     CopyDocument,
     Download,
     ArrowDown,
     Picture,
+    Loading,
 } from '@element-plus/icons-vue';
 import mermaid from 'mermaid';
 import DiagramCode from './DiagramCode.vue';
-import { copyToClipboard } from '../services/copyService';
+import { copyToClipboard } from '../../../services/copyService';
 
 // 类型定义
 interface Props {
@@ -166,23 +169,9 @@ const initMermaid = () => {
     mermaid.initialize({
         startOnLoad: false,
         theme: 'default',
-        themeVariables: {
-            primaryColor: '#409EFF',
-            primaryTextColor: '#303133',
-            primaryBorderColor: '#409EFF',
-            lineColor: '#909399',
-            sectionBkgColor: '#F5F7FA',
-            altSectionBkgColor: '#FFFFFF',
-            gridColor: '#E4E7ED',
-            secondaryColor: '#67C23A',
-            tertiaryColor: '#E6A23C',
-        },
+        securityLevel: 'loose',
         fontFamily: 'Arial, sans-serif',
         fontSize: 14,
-        flowchart: {
-            htmlLabels: true,
-            curve: 'basis',
-        },
     });
 };
 
@@ -192,11 +181,12 @@ const renderDiagram = async () => {
 
     try {
         await nextTick();
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
         const graphId = `diagram-${Date.now()}`;
-        const { svg } = await mermaid.render(graphId, props.diagramCode);
+        const result = await mermaid.render(graphId, props.diagramCode);
 
-        diagramContainer.value.innerHTML = svg;
+        diagramContainer.value.innerHTML = result.svg || result;
 
         // 添加交互功能
         addInteractivity();

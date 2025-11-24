@@ -1,5 +1,10 @@
-import { sendChatMessage, APIError, APIErrorType } from './llmService';
-import type { LLMConfiguration, DiagramGenerationOptions } from '../types';
+import {
+  llmService,
+  APIError,
+  APIErrorType,
+} from '../../llm/services/llmService';
+import type { LLMConfiguration } from '../../llm/types';
+import type { DiagramGenerationOptions } from '../types';
 
 // 图表生成结果
 export interface DiagramGenerationResult {
@@ -14,10 +19,10 @@ export interface DiagramGenerationResult {
   };
   error?: {
     type:
-    | 'api_error'
-    | 'validation_error'
-    | 'parsing_error'
-    | 'generation_error';
+      | 'api_error'
+      | 'validation_error'
+      | 'parsing_error'
+      | 'generation_error';
     message: string;
     details?: any;
   };
@@ -226,7 +231,7 @@ export class DiagramService {
       // 模拟流式响应（由于我们的API客户端不支持真正的流式，这里用轮询模拟）
       for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
         try {
-          const response = await sendChatMessage(config, prompt, {
+          const response = await llmService.sendChatMessage(config, prompt, {
             model: 'gpt-3.5-turbo',
             maxTokens: 2000,
             temperature: 0.3,
@@ -318,7 +323,7 @@ export class DiagramService {
 
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
       try {
-        const response = await sendChatMessage(config, prompt, {
+        const response = await llmService.sendChatMessage(config, prompt, {
           model: 'gpt-3.5-turbo',
           maxTokens: 2000,
           temperature: 0.3,
@@ -512,6 +517,7 @@ export class DiagramService {
   }
 }
 
-// 导出便捷函数
+// 导出服务实例和便捷函数
+export const diagramService = DiagramService;
 export const generateDiagram = DiagramService.generateDiagram;
 export const generateDiagramStream = DiagramService.generateDiagramStream;

@@ -30,10 +30,22 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    // Production TypeScript Configuration - 严格模式
+    "strict": true, // 启用所有严格类型检查
+    "noUnusedLocals": true, // 检查未使用的局部变量
+    "noUnusedParameters": true, // 检查未使用的参数
+    "noImplicitReturns": true, // 检查缺失的返回语句
+    "exactOptionalPropertyTypes": true, // 严格的可选属性处理
+    "noImplicitAny": true, // 禁止隐式any类型
+    "noImplicitThis": true, // 禁止隐式this类型
+    "noImplicitOverride": true, // 要求显式覆盖声明
+    "noPropertyAccessFromIndexSignature": false, // 根据项目需求调整
+    "noUncheckedIndexedAccess": true, // 严格的索引访问检查
+    "noFallthroughCasesInSwitch": true, // switch语句的穿透检查
+    // 确保编辑器正确识别类型
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "types": [
       "vite/client",
       "element-plus/global",

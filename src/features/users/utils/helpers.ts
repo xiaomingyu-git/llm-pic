@@ -61,7 +61,9 @@ export const formatTimeOnly = (dateString: string): string => {
 /**
  * 生成用户头像URL
  */
-export const generateAvatarUrl = (user: Pick<User, 'id' | 'name' | 'email'>): string => {
+export const generateAvatarUrl = (
+  user: Pick<User, 'id' | 'name' | 'email'>
+): string => {
   // 使用 Gravatar 或者其他头像服务
   const baseUrl = 'https://api.dicebear.com/7.x/avataaars/svg';
   const seed = `${user.email}-${user.id}`;
@@ -78,7 +80,10 @@ export const getDisplayName = (user: User): string => {
 /**
  * 检查用户是否在线（基于最后更新时间）
  */
-export const isUserOnline = (user: User, thresholdMinutes: number = 5): boolean => {
+export const isUserOnline = (
+  user: User,
+  thresholdMinutes: number = 5
+): boolean => {
   try {
     const now = new Date().getTime();
     const lastUpdate = new Date(user.updatedAt).getTime();
@@ -133,11 +138,12 @@ export const searchUsers = (users: User[], keyword: string): User[] => {
   }
 
   const lowerKeyword = keyword.toLowerCase();
-  return users.filter(user =>
-    user.name.toLowerCase().includes(lowerKeyword) ||
-    user.email.toLowerCase().includes(lowerKeyword) ||
-    user.phone.includes(keyword) ||
-    user.id.toString().includes(keyword)
+  return users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(lowerKeyword) ||
+      user.email.toLowerCase().includes(lowerKeyword) ||
+      user.phone.includes(keyword) ||
+      user.id.toString().includes(keyword)
   );
 };
 
@@ -148,7 +154,7 @@ export const filterUsersByRole = (users: User[], role?: string): User[] => {
   if (!role) {
     return users;
   }
-  return users.filter(user => user.role === role);
+  return users.filter((user) => user.role === role);
 };
 
 /**
@@ -158,7 +164,7 @@ export const filterUsersByStatus = (users: User[], status?: string): User[] => {
   if (!status) {
     return users;
   }
-  return users.filter(user => user.status === status);
+  return users.filter((user) => user.status === status);
 };
 
 /**
@@ -174,7 +180,7 @@ export const getUserStatistics = (users: User[]) => {
     moderator: 0,
   };
 
-  users.forEach(user => {
+  users.forEach((user) => {
     // 按状态统计
     if (user.status === 'active') {
       stats.active++;

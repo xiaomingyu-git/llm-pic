@@ -2,10 +2,34 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import AutoImport from 'unplugin-auto-import/vite'
 
 export default defineConfig({
   plugins: [
     vue(),
+    // Element Plus 自动导入插件
+    Components({
+      resolvers: [ElementPlusResolver({
+        importStyle: false
+      })],
+      dts: true,
+      directoryAsNamespace: true,
+      include: [/\.vue$/, /\.vue\?vue/, /\.tsx$/],
+      exclude: [/[\\/]node_modules[\\/]/, /[\\/]\.git[\\/]/, /[\\/]\.nuxt[\\/]/]
+    }),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+      imports: ['vue', 'vue-router', 'pinia'],
+      dts: true,
+      vueTemplate: true,
+      eslintrc: {
+        enabled: true,
+        filepath: './.eslintrc-auto-import.json',
+        globalsPropValue: true
+      }
+    }),
     // 构建分析插件
     process.env.ANALYZE && visualizer({
       open: true,
@@ -29,7 +53,7 @@ export default defineConfig({
     minify: 'esbuild', // 使用默认的esbuild压缩器
     rollupOptions: {
       output: {
-        // 简化代码分割，避免过度拆分
+        // 优化的代码分割策略
         manualChunks: (id) => {
           // Vue生态单独分包
           if (id.includes('vue') && !id.includes('element-plus')) {
@@ -46,8 +70,12 @@ export default defineConfig({
             return 'utils';
           }
 
-          // Mermaid不要拆分得太细，保持在一起
+          // Mermaid及其依赖进一步拆分
           if (id.includes('mermaid')) {
+            // 将mermaid核心与其他依赖分离
+            if (id.includes('mermaid') && !id.includes('mermaid/dist/')) {
+              return 'mermaid-core';
+            }
             return 'mermaid';
           }
 
@@ -56,8 +84,10 @@ export default defineConfig({
             return 'chart-libs';
           }
 
-          // 不要使用默认的vendor分组，让其他库保持独立
-          // 这样可以避免产生过大的vendor包
+          // KaTeX数学公式库单独分包
+          if (id.includes('katex')) {
+            return 'katex';
+          }
         },
 
         // chunk文件名优化
@@ -92,8 +122,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
   },
 
-  // 依赖预构建优化
+  // 依赖预构建优化 - 修复Mermaid动态导入问题
   optimizeDeps: {
-    include: ['vue', 'element-plus', 'axios', 'mermaid'],
+    include: [
+      'vue',
+      'element-plus',
+      'axios',
+      'mermaid'
+    ],
   },
 })

@@ -1,4 +1,4 @@
-import { apiClient } from './api';
+import { apiClient } from '../../../services/api';
 import type { LLMConfiguration } from '../types';
 
 // 连接测试响应接口
@@ -347,7 +347,8 @@ export class LLMService {
   }
 }
 
-// 导出测试连接的简化函数
+// 导出服务实例和简化函数
+export const llmService = LLMService;
 export const testConnection = LLMService.testConnection;
 export const getAvailableModels = LLMService.getAvailableModels;
 export const sendChatMessage = LLMService.sendChatMessage;

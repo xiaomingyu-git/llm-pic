@@ -66,7 +66,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const buttonSize = computed(() => props.compact ? 'small' : props.size);
+const buttonSize = computed(() => (props.compact ? 'small' : props.size));
 
 const handleEdit = () => {
   emit('edit', props.user, props.index);

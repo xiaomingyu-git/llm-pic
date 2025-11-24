@@ -64,7 +64,7 @@ export class ApiService {
         config.metadata = { startTime: Date.now() };
 
         // 应用自定义请求拦截器
-        let finalConfig: AxiosRequestConfig = config;
+        let finalConfig = config as any;
         for (const interceptor of this.requestInterceptors) {
           finalConfig = interceptor(finalConfig);
         }
@@ -125,7 +125,7 @@ export class ApiService {
     }
   }
 
-  private getErrorMessage(status: number, data: unknown): string {
+  private getErrorMessage(status: number, data: any): string {
     switch (status) {
       case 400:
         return data?.message || '请求参数错误';
@@ -233,7 +233,7 @@ export class ApiService {
   }
 
   // 通用GET请求
-  async get<T = unknown>(
+  async get<T = any>(
     url: string,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
@@ -245,9 +245,9 @@ export class ApiService {
   }
 
   // 通用POST请求
-  async post<T = unknown>(
+  async post<T = any>(
     url: string,
-    data?: unknown,
+    data?: any,
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<T>> {
     const response = await this.axiosInstance.post<T>(url, data, config);
@@ -307,4 +307,4 @@ export class ApiError extends Error implements ApiErrorInfo {
 export const apiService = ApiService.getInstance();
 
 // 导出axios实例用于更灵活的请求
-export const apiClient: ApiService = ApiService.getInstance();
+export const apiClient = ApiService.getInstance() as any;

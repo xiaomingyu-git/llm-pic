@@ -367,3 +367,6 @@ export class XMLDiagramService {
     `.trim();
   }
 }
+
+// 导出服务实例
+export const xmlDiagramService = XMLDiagramService;

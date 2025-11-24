@@ -10,7 +10,7 @@ import type {
   User,
   SearchParams,
   PaginationConfig,
-  UserActions
+  UserActions,
 } from '../types';
 
 export function useUserManagement() {
@@ -31,15 +31,18 @@ export function useUserManagement() {
 
   // 计算属性
   const hasData = computed(() => tableData.value.length > 0);
-  const isSearching = computed(() =>
-    searchParams.keyword || searchParams.role || searchParams.status
+  const isSearching = computed(
+    () => searchParams.keyword || searchParams.role || searchParams.status
   );
 
   // 方法
   const loadData = async () => {
     loading.value = true;
     try {
-      const response = await userService.getUsers(searchParams, paginationConfig);
+      const response = await userService.getUsers(
+        searchParams,
+        paginationConfig
+      );
 
       if (response.success) {
         tableData.value = response.data;
@@ -50,7 +53,7 @@ export function useUserManagement() {
         tableData.value = [];
         paginationConfig.total = 0;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const errorMessage = '数据加载失败';
       ElMessage.error(errorMessage);
       console.error('Load data error:', error);
@@ -121,7 +124,7 @@ export function useUserManagement() {
       } else {
         ElMessage.error(response.message);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // 用户取消删除或其他错误
       if (error !== 'cancel') {
         console.error('Delete user error:', error);
@@ -157,7 +160,7 @@ export function useUserManagement() {
       } else {
         ElMessage.error(response.message);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error !== 'cancel') {
         console.error('Batch delete error:', error);
       }
@@ -175,7 +178,11 @@ export function useUserManagement() {
 
   // 监听搜索参数变化
   watch(
-    [() => searchParams.keyword, () => searchParams.role, () => searchParams.status],
+    [
+      () => searchParams.keyword,
+      () => searchParams.role,
+      () => searchParams.status,
+    ],
     () => {
       paginationConfig.page = 1;
     },

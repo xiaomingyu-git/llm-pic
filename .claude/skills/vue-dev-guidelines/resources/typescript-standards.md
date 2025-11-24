@@ -97,21 +97,27 @@ Based on your project's actual `tsconfig.json` structure:
 ### Configuration Notes
 
 **Current Project Settings:**
-- **Strict Mode**: Currently disabled (`"strict": false`)
-- **Type Checking**: Relaxed settings for rapid development
+- **Strict Mode**: Enabled (`"strict": true`)
+- **Type Checking**: Strict settings for production-grade code
 - **Module Resolution**: Bundler mode for Vite
 - **Target**: ES2022 for modern features
 - **Path Alias**: Simple `@/*` mapping to `src/*`
+- **Code Quality**: All strict type checking enabled
 
-**Recommended Enhancements:**
+**Production TypeScript Configuration:**
 ```json
-// For production readiness, consider enabling:
+// Production-ready strict configuration
 {
-  "strict": true,              // Enable strict type checking
-  "noUnusedLocals": true,      // Check for unused locals
-  "noUnusedParameters": true,  // Check for unused parameters
-  "noImplicitReturns": true,   // Check for implicit returns
-  "exactOptionalPropertyTypes": true  // More precise optional types
+  "strict": true,                        // Enable all strict type checking
+  "noUnusedLocals": true,                // Check for unused local variables
+  "noUnusedParameters": true,            // Check for unused parameters
+  "noImplicitReturns": true,             // Check for missing return statements
+  "exactOptionalPropertyTypes": true,    // Strict optional property handling
+  "noImplicitAny": true,                 // Disallow implicit any types
+  "noImplicitThis": true,                // Disallow implicit this types
+  "noImplicitOverride": true,            // Require explicit override declarations
+  "noPropertyAccessFromIndexSignature": false,  // Allow indexed access as needed
+  "noUncheckedIndexedAccess": true       // Strict indexed access checking
 }
 ```
 
@@ -126,15 +132,23 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@/components': resolve(__dirname, 'src/components'),
-      '@/composables': resolve(__dirname, 'src/composables'),
-      '@/features': resolve(__dirname, 'src/features'),
-      '@/types': resolve(__dirname, 'src/types'),
-      '@/utils': resolve(__dirname, 'src/utils')
-    }
-  }
+    },
+  },
 });
 ```
+
+### Auto-imports Configuration
+当前项目配置了自动导入功能，通过以下文件管理：
+- `auto-imports.d.ts` - 自动生成的类型声明
+- `components.d.ts` - 组件自动导入类型
+- `.eslintrc-auto-import.json` - ESLint自动导入配置
+
+**项目自动导入配置包括：**
+- Vue 3 Composition API (`ref`, `reactive`, `computed`, 等)
+- Element Plus 组件 (`ElButton`, `ElTable`, 等)
+- Vue Router (`useRouter`, `useRoute`)
+- Pinia 状态管理
+- 自定义 composables 和工具函数
 
 ## Component Typing
 
@@ -198,8 +212,29 @@ const emit = defineEmits<GenericListEmits<User>>();
 ## Type Definitions
 
 ### Type File Organization
+
+#### 功能模块化类型结构 (项目实际模式)
+```
+src/
+├── types/
+│   └── index.ts              # 全局通用类型
+├── features/
+│   ├── users/
+│   │   ├── types/index.ts    # 用户相关类型
+│   │   ├── services/userService.ts
+│   │   ├── components/UserActions.vue
+│   │   └── composables/useUserManagement.ts
+│   ├── llm/
+│   │   ├── types/index.ts    # LLM相关类型
+│   │   └── services/llmService.ts
+│   └── diagram/
+│       ├── types/index.ts    # 图表相关类型
+│       └── services/diagramService.ts
+```
+
+#### 全局类型定义 (src/types/index.ts)
 ```typescript
-// src/types/common.types.ts
+// 通用API响应格式
 export interface ApiResponse<T> {
   data: T;
   success: boolean;
@@ -207,101 +242,181 @@ export interface ApiResponse<T> {
   code?: number;
 }
 
-export interface PaginationParams {
-  page: number;
-  pageSize: number;
-  total?: number;
+// 通用错误信息接口
+export interface ApiErrorInfo {
+  code: string;
+  message: string;
+  details?: Record<string, any>;
+  timestamp: Date;
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
+// 响应式数据基础类型
+export interface BaseResponse<T> {
+  data: T;
+  loading: boolean;
+  error: string | null;
 }
 
+// 选择器选项类型
 export interface SelectOption {
   label: string;
   value: string | number;
   disabled?: boolean;
 }
 
-export interface TableColumn {
-  key: string;
-  label: string;
-  width?: number | string;
-  sortable?: boolean;
-  align?: 'left' | 'center' | 'right';
+// 验证结果类型
+export interface ValidationResult {
+  valid: boolean;
+  message?: string;
+  field?: string;
 }
 
-// src/types/user.types.ts
+// 通用操作回调类型
+export type ActionCallback<T = any> = (payload: T) => void;
+export type AsyncActionCallback<T = any> = (payload: T) => Promise<void>;
+```
+
+#### 功能模块类型示例 (基于项目实际模式)
+```typescript
+// src/features/users/types/index.ts
 export interface User {
   id: number;
   name: string;
   email: string;
-  age: number;
+  phone: string;
+  role: 'admin' | 'user' | 'moderator';
+  status: 'active' | 'inactive';
   avatar?: string;
-  role: UserRole;
-  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export type UserRole = 'admin' | 'user' | 'moderator';
-
-export interface UserCreateRequest {
-  name: string;
-  email: string;
-  age: number;
-  role: UserRole;
+// 用户操作回调类型
+export interface UserActions {
+  onEdit: (user: User, index: number) => void;
+  onView: (user: User) => void;
+  onDelete: (user: User, index: number) => void;
 }
 
-export interface UserUpdateRequest {
-  name?: string;
-  email?: string;
-  age?: number;
-  role?: UserRole;
-  isActive?: boolean;
+// 用户搜索参数
+export interface UserSearchParams {
+  keyword: string;
+  role: string;
+  status: string;
 }
 
-// src/types/auth.types.ts
-export interface LoginRequest {
-  email: string;
-  password: string;
+// src/features/llm/types/index.ts
+export interface LLMConfig {
+  provider: string;
+  model: string;
+  apiKey: string;
+  baseUrl?: string;
+  temperature?: number;
+  maxTokens?: number;
 }
 
-export interface LoginResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
-  expiresIn: number;
+export interface DiagramRequest {
+  input: string;
+  format: 'mermaid' | 'xml';
+  config?: LLMConfig;
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
+// src/features/diagram/types/index.ts
+export interface DiagramData {
+  format: 'mermaid' | 'xml';
+  content: string;
+  metadata?: {
+    title?: string;
+    description?: string;
+  };
 }
 ```
 
-### Composables Typing
+### Composables Typing (项目实际模式)
+
+#### 功能模块 Composables 模式
 ```typescript
-// src/composables/useApiData.ts
+// src/features/users/composables/useUserManagement.ts
+import { ref, reactive, computed } from 'vue';
+import type { User, UserSearchParams, UserActions } from '../types';
+import { userService } from '../services/userService';
+
+export function useUserManagement() {
+  // 响应式数据
+  const loading = ref(false);
+  const tableData = ref<User[]>([]);
+  const searchParams = reactive<UserSearchParams>({
+    keyword: '',
+    role: '',
+    status: '',
+  });
+
+  // 计算属性
+  const hasData = computed(() => tableData.value.length > 0);
+  const filteredData = computed(() => {
+    // 过滤逻辑
+    return tableData.value.filter(user => {
+      const matchesKeyword = user.name.includes(searchParams.keyword) || 
+                           user.email.includes(searchParams.keyword);
+      const matchesRole = !searchParams.role || user.role === searchParams.role;
+      const matchesStatus = !searchParams.status || user.status === searchParams.status;
+      return matchesKeyword && matchesRole && matchesStatus;
+    });
+  });
+
+  // 方法
+  const fetchUsers = async () => {
+    loading.value = true;
+    try {
+      const users = await userService.fetchUsers();
+      tableData.value = users;
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const handleUserAction = async (action: keyof UserActions, user: User, index?: number) => {
+    // 处理用户操作逻辑
+    console.log(`User action: ${action}`, user);
+  };
+
+  return {
+    // 状态
+    loading,
+    tableData,
+    searchParams,
+    // 计算属性
+    hasData,
+    filteredData,
+    // 方法
+    fetchUsers,
+    handleUserAction,
+  };
+}
+```
+
+#### 通用响应式数据模式
+```typescript
+// src/composables/useAsyncData.ts
 import { ref, computed } from 'vue';
 
-export function useApiData<T>(
+export interface AsyncDataOptions<T> {
+  immediate?: boolean;
+  defaultValue?: T;
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+}
+
+export function useAsyncData<T>(
   fetcher: () => Promise<T>,
-  options: {
-    immediate?: boolean;
-    cache?: boolean;
-  } = {}
+  options: AsyncDataOptions<T> = {}
 ) {
-  const data = ref<T | null>(null);
+  const data = ref<T | null>(options.defaultValue ?? null);
   const loading = ref(false);
   const error = ref<string | null>(null);
-  const { immediate = true, cache = false } = options;
+  const { immediate = false } = options;
 
   const execute = async (): Promise<T | null> => {
     loading.value = true;
@@ -310,9 +425,12 @@ export function useApiData<T>(
     try {
       const result = await fetcher();
       data.value = result;
+      options.onSuccess?.(result);
       return result;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error';
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      error.value = errorMessage;
+      options.onError?.(err instanceof Error ? err : new Error(errorMessage));
       return null;
     } finally {
       loading.value = false;
@@ -332,7 +450,8 @@ export function useApiData<T>(
     error,
     execute,
     isReady,
-    hasData
+    hasData,
+    refresh: execute,
   };
 }
 ```
@@ -386,92 +505,281 @@ export function hasProperty<T extends object, K extends string>(
 }
 ```
 
-## Element Plus Typing
+## Element Plus 集成 (项目实际模式)
 
-### Form Typing
+### 自动导入配置
+项目已配置 Element Plus 组件和类型的自动导入，无需手动导入组件。
+
+#### 自动导入内容
+- **组件**: `ElButton`, `ElTable`, `ElForm`, `ElInput`, 等
+- **类型**: `FormInstance`, `FormRules`, `TableColumnCtx`, 等
+- **图标**: Element Plus 图标组件
+
+### 表单组件类型模式
 ```vue
 <script setup lang="ts">
 import type { FormInstance, FormRules } from 'element-plus';
 
-interface LoginForm {
+// 项目中的用户表单接口
+interface UserForm {
+  name: string;
   email: string;
-  password: string;
-  rememberMe: boolean;
+  phone: string;
+  role: 'admin' | 'user' | 'moderator';
+  status: 'active' | 'inactive';
 }
 
+// 表单引用和数据
 const formRef = ref<FormInstance>();
-const form = reactive<LoginForm>({
+const formData = reactive<UserForm>({
+  name: '',
   email: '',
-  password: '',
-  rememberMe: false
+  phone: '',
+  role: 'user',
+  status: 'active',
 });
 
-const rules = reactive<FormRules<LoginForm>>({
+// 表单验证规则
+const rules = reactive<FormRules<UserForm>>({
+  name: [
+    { required: true, message: '请输入姓名', trigger: 'blur' },
+    { min: 2, max: 50, message: '姓名长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
   ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码至少6位', trigger: 'blur' }
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
+  role: [
+    { required: true, message: '请选择角色', trigger: 'change' }
   ]
 });
 
-const submitForm = async () => {
+// 提交处理
+const handleSubmit = async () => {
   if (!formRef.value) return;
   
-  await formRef.value.validate((valid) => {
-    if (valid) {
-      // Submit logic
-    }
-  });
+  try {
+    await formRef.value.validate();
+    // 表单验证通过，执行提交逻辑
+    console.log('Form submitted:', formData);
+  } catch (error) {
+    console.error('Form validation failed:', error);
+  }
+};
+
+// 重置表单
+const resetForm = () => {
+  formRef.value?.resetFields();
 };
 </script>
+
+<template>
+  <ElForm ref="formRef" :model="formData" :rules="rules" label-width="80px">
+    <ElFormItem label="姓名" prop="name">
+      <ElInput v-model="formData.name" placeholder="请输入姓名" />
+    </ElFormItem>
+    
+    <ElFormItem label="邮箱" prop="email">
+      <ElInput v-model="formData.email" placeholder="请输入邮箱" />
+    </ElFormItem>
+    
+    <ElFormItem label="手机号" prop="phone">
+      <ElInput v-model="formData.phone" placeholder="请输入手机号" />
+    </ElFormItem>
+    
+    <ElFormItem label="角色" prop="role">
+      <ElSelect v-model="formData.role" placeholder="请选择角色">
+        <ElOption label="管理员" value="admin" />
+        <ElOption label="普通用户" value="user" />
+        <ElOption label="版主" value="moderator" />
+      </ElSelect>
+    </ElFormItem>
+    
+    <ElFormItem>
+      <ElButton type="primary" @click="handleSubmit">提交</ElButton>
+      <ElButton @click="resetForm">重置</ElButton>
+    </ElFormItem>
+  </ElForm>
+</template>
 ```
 
-### Table Typing
+### 表格组件类型模式
 ```vue
 <script setup lang="ts">
 import type { TableColumnCtx } from 'element-plus';
+import type { User } from '@/features/users/types';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-}
+// 表格数据
+const tableData = ref<User[]>([]);
 
+// 分页配置
+const pagination = reactive({
+  current: 1,
+  pageSize: 10,
+  total: 0,
+});
+
+// 表格列配置
 const tableColumns: TableColumnCtx<User>[] = [
   {
     prop: 'id',
     label: 'ID',
-    width: 80
+    width: 80,
+    sortable: true,
   },
   {
     prop: 'name',
     label: '姓名',
-    width: 120
+    width: 120,
+    showOverflowTooltip: true,
   },
   {
     prop: 'email',
-    label: '邮箱'
+    label: '邮箱',
+    minWidth: 180,
+    showOverflowTooltip: true,
+  },
+  {
+    prop: 'phone',
+    label: '手机号',
+    width: 130,
   },
   {
     prop: 'role',
     label: '角色',
-    width: 100
+    width: 100,
+    formatter: (row: User) => {
+      const roleMap = {
+        admin: '管理员',
+        user: '普通用户',
+        moderator: '版主',
+      };
+      return roleMap[row.role];
+    },
+  },
+  {
+    prop: 'status',
+    label: '状态',
+    width: 100,
+    formatter: (row: User) => {
+      return row.status === 'active' ? '启用' : '禁用';
+    },
   },
   {
     label: '操作',
     width: 200,
-    formatter: (row, column, cellValue, index) => {
-      // Custom formatting logic
-      return cellValue;
-    }
-  }
+    fixed: 'right',
+    formatter: (row: User, column: TableColumnCtx<User>, cellValue: any, index: number) => {
+      // 自定义操作按钮
+      return h('div', { class: 'table-actions' }, [
+        h(ElButton, { 
+          type: 'primary', 
+          size: 'small',
+          onClick: () => handleEdit(row, index)
+        }, '编辑'),
+        h(ElButton, { 
+          type: 'danger', 
+          size: 'small',
+          onClick: () => handleDelete(row, index)
+        }, '删除'),
+      ]);
+    },
+  },
 ];
+
+// 事件处理
+const handleEdit = (user: User, index: number) => {
+  console.log('Edit user:', user, 'at index:', index);
+};
+
+const handleDelete = (user: User, index: number) => {
+  console.log('Delete user:', user, 'at index:', index);
+};
+
+const handleSizeChange = (size: number) => {
+  pagination.pageSize = size;
+  // 重新加载数据
+};
+
+const handleCurrentChange = (current: number) => {
+  pagination.current = current;
+  // 重新加载数据
+};
 </script>
+
+<template>
+  <ElTable :data="tableData" border stripe>
+    <ElTableColumn 
+      v-for="column in tableColumns" 
+      :key="column.prop || column.label"
+      v-bind="column"
+    />
+  </ElTable>
+  
+  <ElPagination
+    v-model:current-page="pagination.current"
+    v-model:page-size="pagination.pageSize"
+    :page-sizes="[10, 20, 50, 100]"
+    :total="pagination.total"
+    layout="total, sizes, prev, pager, next, jumper"
+    @size-change="handleSizeChange"
+    @current-change="handleCurrentChange"
+  />
+</template>
+```
+
+### 自定义按钮组件类型
+```vue
+<script setup lang="ts">
+// YjButton.vue - 项目中的自定义按钮组件
+interface YjButtonProps {
+  type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'text' | 'default';
+  size?: 'large' | 'default' | 'small';
+  disabled?: boolean;
+  loading?: boolean;
+  icon?: object;
+  plain?: boolean;
+  round?: boolean;
+  circle?: boolean;
+  tag?: string;
+}
+
+interface YjButtonEmits {
+  (e: 'click', event: MouseEvent): void;
+}
+
+const props = withDefaults(defineProps<YjButtonProps>(), {
+  type: 'default',
+  size: 'default',
+  disabled: false,
+  loading: false,
+  plain: false,
+  round: false,
+  circle: false,
+  tag: 'button',
+});
+
+const emit = defineEmits<YjButtonEmits>();
+
+const handleClick = (event: MouseEvent) => {
+  if (!props.disabled && !props.loading) {
+    emit('click', event);
+  }
+};
+</script>
+
+<template>
+  <ElButton
+    v-bind="props"
+    @click="handleClick"
+  >
+    <slot />
+  </ElButton>
+</template>
 ```
 
 ## Advanced Typing
@@ -494,52 +802,231 @@ export type ComponentEmits<T> = T extends new (...args: any[]) => infer R
   : never;
 ```
 
-### Generic Service Typing
+### 服务层类型模式 (项目实际模式)
+
+#### 单例模式服务类
 ```typescript
-// src/services/baseService.ts
-import { apiClient } from '@/utils/apiClient';
-import type { ApiResponse, PaginatedResponse } from '@/types';
+// src/services/api.ts
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { ApiResponse, ApiErrorInfo } from '@/types';
 
-export abstract class BaseService<T, CreateT = Partial<T>, UpdateT = Partial<T>> {
-  protected abstract baseUrl: string;
+// 自定义错误类
+export class ApiError extends Error implements ApiErrorInfo {
+  public readonly code: string;
+  public readonly timestamp: Date;
+  public readonly requestUrl?: string;
+  public readonly requestMethod?: string;
+  public readonly responseTime?: number;
+  public readonly originalError?: any;
 
-  async getAll(params?: any): Promise<T[]> {
-    const response = await apiClient.get<ApiResponse<T[]>>(this.baseUrl, { params });
-    return response.data.data;
+  constructor(message: string, code: string, originalError?: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+    this.timestamp = new Date();
+    this.originalError = originalError;
   }
 
-  async getById(id: number | string): Promise<T> {
-    const response = await apiClient.get<ApiResponse<T>>(`${this.baseUrl}/${id}`);
-    return response.data.data;
+  static fromAxiosError(error: AxiosError): ApiError {
+    const message = error.response?.data?.message || error.message || 'Network error';
+    const code = error.response?.data?.code || 'NETWORK_ERROR';
+    const apiError = new ApiError(message, code, error);
+    
+    apiError.requestUrl = error.config?.url;
+    apiError.requestMethod = error.config?.method?.toUpperCase();
+    
+    return apiError;
+  }
+}
+
+// 单例模式 API 服务
+export class ApiService {
+  private static instance: ApiService;
+  private axiosInstance: AxiosInstance;
+
+  private constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    this.setupInterceptors();
   }
 
-  async create(data: CreateT): Promise<T> {
-    const response = await apiClient.post<ApiResponse<T>>(this.baseUrl, data);
-    return response.data.data;
+  static getInstance(): ApiService {
+    if (!ApiService.instance) {
+      ApiService.instance = new ApiService();
+    }
+    return ApiService.instance;
   }
 
-  async update(id: number | string, data: UpdateT): Promise<T> {
-    const response = await apiClient.put<ApiResponse<T>>(`${this.baseUrl}/${id}`, data);
-    return response.data.data;
+  private setupInterceptors(): void {
+    // 请求拦截器
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const startTime = Date.now();
+        config.metadata = { startTime };
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // 响应拦截器
+    this.axiosInstance.interceptors.response.use(
+      (response: AxiosResponse) => {
+        const endTime = Date.now();
+        const responseTime = endTime - (response.config.metadata?.startTime || endTime);
+        
+        return response;
+      },
+      (error: AxiosError) => {
+        const apiError = ApiError.fromAxiosError(error);
+        return Promise.reject(apiError);
+      }
+    );
   }
 
-  async delete(id: number | string): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/${id}`);
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.get<ApiResponse<T>>(url, config);
+    return response.data;
   }
 
-  async getPaginated(params: any): Promise<PaginatedResponse<T>> {
-    const response = await apiClient.get<PaginatedResponse<T>>(`${this.baseUrl}/paginated`, { params });
+  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.post<ApiResponse<T>>(url, data, config);
+    return response.data;
+  }
+
+  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.put<ApiResponse<T>>(url, data, config);
+    return response.data;
+  }
+
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const response = await this.axiosInstance.delete<ApiResponse<T>>(url, config);
     return response.data;
   }
 }
 
-// Usage
-class UserService extends BaseService<User, UserCreateRequest, UserUpdateRequest> {
-  protected baseUrl = '/users';
-  
-  async getByEmail(email: string): Promise<User | null> {
-    const users = await this.getAll({ email });
-    return users[0] || null;
+// 导出单例实例
+export const apiService = ApiService.getInstance();
+```
+
+#### 功能模块服务类
+```typescript
+// src/features/users/services/userService.ts
+import { apiService, ApiError } from '@/services/api';
+import type { User } from '../types';
+
+export class UserService {
+  // 模拟数据存储
+  private static users: User[] = [
+    {
+      id: 1,
+      name: '张三',
+      email: 'zhangsan@example.com',
+      phone: '13800138000',
+      role: 'admin',
+      status: 'active',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    },
+    // 更多模拟数据...
+  ];
+
+  async fetchUsers(): Promise<User[]> {
+    // 模拟API调用
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve([...UserService.users]);
+      }, 100);
+    });
+  }
+
+  async createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    const newUser: User = {
+      ...userData,
+      id: Math.max(...UserService.users.map(u => u.id)) + 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    UserService.users.push(newUser);
+    return newUser;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const userIndex = UserService.users.findIndex(u => u.id === id);
+    if (userIndex === -1) {
+      throw new ApiError('User not found', 'USER_NOT_FOUND');
+    }
+
+    UserService.users[userIndex] = {
+      ...UserService.users[userIndex],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return UserService.users[userIndex];
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    const userIndex = UserService.users.findIndex(u => u.id === id);
+    if (userIndex === -1) {
+      throw new ApiError('User not found', 'USER_NOT_FOUND');
+    }
+
+    UserService.users.splice(userIndex, 1);
+  }
+}
+
+// 导出单例实例
+export const userService = new UserService();
+```
+
+#### 错误处理模式
+```typescript
+// src/utils/errorHandler.ts
+import { ApiError } from '@/services/api';
+
+export class ErrorHandler {
+  static handle(error: unknown): string {
+    if (error instanceof ApiError) {
+      return this.handleApiError(error);
+    }
+    
+    if (error instanceof Error) {
+      return error.message;
+    }
+    
+    return 'An unknown error occurred';
+  }
+
+  private static handleApiError(error: ApiError): string {
+    switch (error.code) {
+      case 'NETWORK_ERROR':
+        return '网络连接失败，请检查网络设置';
+      case 'UNAUTHORIZED':
+        return '未授权访问，请重新登录';
+      case 'FORBIDDEN':
+        return '权限不足，无法执行此操作';
+      case 'NOT_FOUND':
+        return '请求的资源不存在';
+      case 'VALIDATION_ERROR':
+        return '数据验证失败';
+      default:
+        return error.message || '服务器错误';
+    }
+  }
+
+  static log(error: unknown): void {
+    console.error('Error occurred:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 ```
@@ -575,23 +1062,23 @@ export type { User, UserRole } from './user.types';
 export type { AuthState, LoginRequest } from './auth.types';
 ```
 
-## Best Practices (Project-Adjusted)
+## Best Practices (Strict TypeScript Standards)
 
-### Do's (Current Project Configuration)
-- ✅ Use interface over type for object shapes
-- ✅ Use type imports for type-only imports  
-- ✅ Type props and emits with interfaces
-- ✅ Use generic types for reusable components
-- ✅ Create type guards for runtime type checking
-- ✅ Use utility types for type transformations
-- ✅ Provide proper return types for functions
-- ✅ Leverage ES2022 features for modern syntax
-- ✅ Use `@/*` path aliases for cleaner imports
-
-### Recommended for Production
-- 🔄 Consider enabling strict mode gradually
-- 🔄 Enable `noUnusedLocals` and `noUnusedParameters`
-- 🔄 Add `exactOptionalPropertyTypes` for better optional type handling
+### Mandatory Practices (Production Code)
+- ✅ **Always use interface** over type for object shapes
+- ✅ **Always use type imports** for type-only imports  
+- ✅ **Always type props and emits** with explicit interfaces
+- ✅ **Always use generic types** for reusable components
+- ✅ **Always create type guards** for runtime type checking
+- ✅ **Always use utility types** for type transformations
+- ✅ **Always provide explicit return types** for functions
+- ✅ **Leverage ES2022 features** for modern syntax
+- ✅ **Use `@/*` path aliases** for cleaner imports
+- ✅ **Define all function parameters** with explicit types
+- ✅ **Use explicit typing for complex objects** - no implicit any
+- ✅ **Handle all possible error cases** with proper typing
+- ✅ **Use const assertions** for readonly data structures
+- ✅ **Implement proper error boundaries** with typed error handling
 
 ### 🔥 CRITICAL: Safe Object Index Patterns
 
@@ -684,10 +1171,122 @@ const statusTagType = computed((): 'success' | 'danger' | 'info' => {
 - [ ] 🔥 **Nullish coalescing (??) used instead of logical OR (||)**
 - [ ] 🔥 **All computed properties with object access are type-safe**
 
-### Progressive Enhancement
-- [ ] [Optional] Enable strict mode when ready
-- [ ] [Optional] Enable unused variable checks
-- [ ] [Optional] Add more strict type checking rules
-- [ ] [Optional] Configure more specific path aliases if needed
+## Production Development Standards
 
-This TypeScript standards guide provides comprehensive patterns for type-safe Vue 3 development.
+### 代码质量要求
+
+#### 禁止使用的模式
+- ❌ **任何 `any` 类型** - 必须定义具体类型
+- ❌ **隐式类型推断** - 必须显式声明类型
+- ❌ **未使用的变量** - 严格检查并清理
+- ❌ **缺少返回类型** - 所有函数必须声明返回类型
+- ❌ **类型断言滥用** - 优先使用类型守卫而非断言
+
+#### 强制性类型检查
+```typescript
+// ✅ 正确 - 完整类型定义
+interface UserData {
+  readonly id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+const processUserData = (userData: UserData): Promise<ProcessedUser> => {
+  // 实现逻辑必须处理所有可能的错误情况
+};
+
+// ❌ 错误 - 缺少类型信息
+const processData = (data: any) => {
+  return data.processed;
+};
+```
+
+### 错误处理标准
+```typescript
+// 必须使用类型化的错误处理
+const apiCallWrapper = async <T>(
+  apiCall: () => Promise<T>
+): Promise<{ success: true; data: T } | { success: false; error: ApiError }> => {
+  try {
+    const data = await apiCall();
+    return { success: true, data };
+  } catch (error) {
+    const apiError = error instanceof ApiError ? error : ApiError.fromUnknown(error);
+    return { success: false, error: apiError };
+  }
+};
+```
+
+### 代码审查标准
+**必须检查的项目：**
+- [ ] 所有函数都有明确的参数和返回类型
+- [ ] 组件Props和Emits使用接口定义
+- [ ] 没有任何`any`类型（除非有明确注释说明）
+- [ ] 复杂对象使用`Readonly`或`as const`
+- [ ] 错误处理覆盖所有可能的情况
+- [ ] 异步函数正确处理Promise类型
+
+**代码检查清单：**
+```typescript
+// 每个新组件必须包含：
+interface ComponentProps {
+  // 所有props必须有明确类型
+}
+
+interface ComponentEmits {
+  // 所有emit事件必须有类型定义
+}
+
+// 每个API调用必须包含：
+interface ApiResponse<T> {
+  data: T;
+  success: boolean;
+}
+
+// 每个服务方法必须处理错误类型：
+type ServiceResult<T> = 
+  | { success: true; data: T }
+  | { success: false; error: ApiError };
+```
+
+### 性能优化标准
+```typescript
+// 使用严格类型优化性能
+// ✅ 正确 - 使用常量断言
+const STATUS_TYPES = {
+  PENDING: 'pending',
+  SUCCESS: 'success',
+  ERROR: 'error'
+} as const;
+
+type StatusType = typeof STATUS_TYPES[keyof typeof STATUS_TYPES];
+
+// ✅ 正确 - 只读接口
+interface ReadonlyConfig {
+  readonly apiUrl: string;
+  readonly timeout: number;
+  readonly retries: number;
+}
+```
+
+### 测试类型标准
+```typescript
+// 测试也必须使用严格类型
+describe('UserService', () => {
+  it('should return typed user data', async () => {
+    const result: User | null = await userService.getUserById(1);
+    expect(result).toBeDefined();
+    
+    // 类型守卫检查
+    if (result) {
+      expectTypeOf(result.id).toBeNumber();
+      expectTypeOf(result.name).toBeString();
+    }
+  });
+});
+```
+
+This TypeScript standards guide enforces strict type safety for production-grade Vue 3 development with zero tolerance for type ambiguity.
+
+This TypeScript standards guide provides comprehensive patterns for type-safe Vue 3 development with a focus on practical, project-specific implementations and gradual improvement strategies.
