@@ -5,7 +5,8 @@ export * from './utils/errors';
 // export { default as apiService } from './services/api'; // 避免重复导出 ApiResponse
 export * from './services/copyService';
 
-// Feature modules - avoid type conflicts
+// Feature modules - avoid type conflicts by selective exports
 export * from './features/diagram';
-export * from './features/llm';
+export * from './features/llm/types';
+export * from './features/llm/services/llmService';
 export * from './features/users';

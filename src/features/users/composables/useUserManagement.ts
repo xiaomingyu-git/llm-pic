@@ -3,8 +3,8 @@
  * 用户管理相关的组合式函数
  */
 
-// Vue composition API imports - using global declarations from auto-imports
-// import type { Ref, UnwrapNestedRefs } from 'vue';
+// Vue composition API imports
+import { ref, reactive, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { userService } from '../services/userService';
 import type {
