@@ -27,12 +27,8 @@ export interface PaginationConfig {
   total: number;
 }
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
-  total?: number;
-}
+// 从全局类型导入统一的 ApiResponse
+export type { ApiResponse } from '../../../types';
 
 export interface UserListResponse extends ApiResponse<User[]> {
   total: number;

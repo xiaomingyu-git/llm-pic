@@ -95,20 +95,8 @@ export interface LLMProviderConfig {
   };
 }
 
-// API 相关类型
-export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-}
-
-export interface ApiErrorInfo {
-  code: string;
-  message: string;
-  details?: any;
-  statusCode?: number;
-}
+// API 相关类型 - 从全局类型导入统一的 ApiResponse
+export type { ApiResponse, ApiErrorInfo } from '../../../types';
 
 export interface RequestConfig {
   timeout?: number;
