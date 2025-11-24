@@ -3,7 +3,13 @@
  * 用户管理相关的工具函数
  */
 
-import type { User } from '../types';
+import type {
+  User,
+  UserRole,
+  UserStatus,
+  UserValidationRules,
+  UserStatistics,
+} from '../types';
 
 /**
  * 格式化日期时间
@@ -227,4 +233,196 @@ export const sortUsers = (
 
     return 0;
   });
+};
+
+/**
+ * 用户验证规则配置
+ */
+export const getUserValidationRules = (): UserValidationRules => ({
+  name: [
+    {
+      required: true,
+      min: 2,
+      max: 50,
+      message: '姓名长度应在2-50个字符之间',
+    },
+  ],
+  email: [
+    {
+      required: true,
+      message: '请输入有效的邮箱地址',
+    },
+    {
+      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: '邮箱格式不正确',
+    },
+  ],
+  phone: [
+    {
+      required: true,
+      message: '请输入有效的手机号码',
+    },
+    {
+      pattern: /^1[3-9]\d{9}$/,
+      message: '手机号格式不正确',
+    },
+  ],
+  role: [
+    {
+      required: true,
+      message: '请选择用户角色',
+    },
+  ],
+  status: [
+    {
+      required: true,
+      message: '请选择用户状态',
+    },
+  ],
+});
+
+/**
+ * 验证单个字段
+ */
+export const validateField = (
+  fieldName: keyof UserValidationRules,
+  value: string,
+  rules?: UserValidationRules
+): { isValid: boolean; message?: string } => {
+  const validationRules = rules || getUserValidationRules();
+  const fieldRules = validationRules[fieldName];
+
+  if (!fieldRules || !fieldRules.length) {
+    return { isValid: true };
+  }
+
+  for (const rule of fieldRules) {
+    // 检查必填项
+    if (rule.required && !value.trim()) {
+      return { isValid: false, message: rule.message };
+    }
+
+    // 检查最小长度
+    if (rule.min && value.length < rule.min) {
+      return { isValid: false, message: rule.message };
+    }
+
+    // 检查最大长度
+    if (rule.max && value.length > rule.max) {
+      return { isValid: false, message: rule.message };
+    }
+
+    // 检查正则表达式
+    if (rule.pattern && !rule.pattern.test(value)) {
+      return { isValid: false, message: rule.message };
+    }
+  }
+
+  return { isValid: true };
+};
+
+/**
+ * 验证用户数据
+ */
+export const validateUser = (
+  userData: Partial<User>
+): { isValid: boolean; errors: Record<string, string> } => {
+  const errors: Record<string, string> = {};
+
+  if (userData.name !== undefined) {
+    const nameValidation = validateField('name', userData.name);
+    if (!nameValidation.isValid && nameValidation.message) {
+      errors.name = nameValidation.message;
+    }
+  }
+
+  if (userData.email !== undefined) {
+    const emailValidation = validateField('email', userData.email);
+    if (!emailValidation.isValid && emailValidation.message) {
+      errors.email = emailValidation.message;
+    }
+  }
+
+  if (userData.phone !== undefined) {
+    const phoneValidation = validateField('phone', userData.phone);
+    if (!phoneValidation.isValid && phoneValidation.message) {
+      errors.phone = phoneValidation.message;
+    }
+  }
+
+  if (userData.role !== undefined) {
+    const roleValidation = validateField('role', userData.role);
+    if (!roleValidation.isValid && roleValidation.message) {
+      errors.role = roleValidation.message;
+    }
+  }
+
+  if (userData.status !== undefined) {
+    const statusValidation = validateField('status', userData.status);
+    if (!statusValidation.isValid && statusValidation.message) {
+      errors.status = statusValidation.message;
+    }
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
+/**
+ * 获取用户统计信息（使用新的类型）
+ */
+export const getUserStatisticsDetailed = (users: User[]): UserStatistics => {
+  const totalUsers = users.length;
+  const activeUsers = users.filter(user => user.status === 'active').length;
+  const inactiveUsers = totalUsers - activeUsers;
+
+  const usersByRole: Record<UserRole, number> = {
+    admin: 0,
+    user: 0,
+    moderator: 0,
+  };
+
+  users.forEach(user => {
+    usersByRole[user.role]++;
+  });
+
+  // 计算最近注册用户（最近7天）
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentRegistrations = users.filter(user =>
+    new Date(user.createdAt) >= sevenDaysAgo
+  ).length;
+
+  return {
+    totalUsers,
+    activeUsers,
+    inactiveUsers,
+    usersByRole,
+    recentRegistrations,
+  };
+};
+
+/**
+ * 角色标签映射
+ */
+export const getRoleLabel = (role: UserRole): string => {
+  const roleLabels: Record<UserRole, string> = {
+    admin: '管理员',
+    user: '普通用户',
+    moderator: '协管员',
+  };
+  return roleLabels[role] || role;
+};
+
+/**
+ * 状态标签映射
+ */
+export const getStatusLabel = (status: UserStatus): string => {
+  const statusLabels: Record<UserStatus, string> = {
+    active: '启用',
+    inactive: '禁用',
+  };
+  return statusLabels[status] || status;
 };
