@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
 
 # Stop event hook that runs build checks and provides instructions for error resolution

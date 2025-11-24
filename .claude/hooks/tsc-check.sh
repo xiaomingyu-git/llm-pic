@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # TSC Hook with Visible Output
 # Uses stderr for visibility in Claude Code main interface

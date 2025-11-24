@@ -20,7 +20,8 @@
     "axios": "^1.6.2",
     "element-plus": "^2.4.4",
     "mermaid": "^10.6.1",
-    "vue": "^3.3.8"
+    "vue": "^3.3.8",
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.15.0",

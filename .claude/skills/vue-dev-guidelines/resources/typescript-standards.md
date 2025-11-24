@@ -2,14 +2,55 @@
 
 ## Type Configuration
 
-### TypeScript Configuration (tsconfig.json)
+### Project TypeScript Configuration
+
+Based on your project's actual `tsconfig.json` structure:
+
+#### Root tsconfig.json
 ```json
 {
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
   "compilerOptions": {
-    "target": "ES2020",
+    "skipLibCheck": true
+  }
+}
+```
+
+#### Application tsconfig.app.json
+```json
+{
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "src/**/__tests__/*"
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -17,27 +58,60 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"],
-      "@/components/*": ["src/components/*"],
-      "@/composables/*": ["src/composables/*"],
-      "@/features/*": ["src/features/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"]
-    }
-  },
+    "types": [
+      "vite/client",
+      "element-plus/global",
+      "node"
+    ]
+  }
+}
+```
+
+#### Node.js tsconfig.node.json
+```json
+{
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
+    "vite.config.*",
+    "vitest.config.*",
+    "cypress.config.*",
+    "nightwatch.conf.*",
+    "playwright.config.*"
   ],
-  "exclude": ["node_modules"]
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": [
+      "node"
+    ]
+  }
+}
+```
+
+### Configuration Notes
+
+**Current Project Settings:**
+- **Strict Mode**: Currently disabled (`"strict": false`)
+- **Type Checking**: Relaxed settings for rapid development
+- **Module Resolution**: Bundler mode for Vite
+- **Target**: ES2022 for modern features
+- **Path Alias**: Simple `@/*` mapping to `src/*`
+
+**Recommended Enhancements:**
+```json
+// For production readiness, consider enabling:
+{
+  "strict": true,              // Enable strict type checking
+  "noUnusedLocals": true,      // Check for unused locals
+  "noUnusedParameters": true,  // Check for unused parameters
+  "noImplicitReturns": true,   // Check for implicit returns
+  "exactOptionalPropertyTypes": true  // More precise optional types
 }
 ```
 
@@ -276,6 +350,9 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
+// 🔥 CRITICAL: Safe Object Index Patterns
+export type SafeRecord<K extends string | number | symbol, T> = Record<K, T>;
+
 // Usage examples
 type UserUpdate = Optional<User, 'name' | 'email'>;
 type UserWithRequiredEmail = RequiredBy<User, 'email'>;
@@ -498,27 +575,88 @@ export type { User, UserRole } from './user.types';
 export type { AuthState, LoginRequest } from './auth.types';
 ```
 
-## Best Practices
+## Best Practices (Project-Adjusted)
 
-### Do's
-- ✅ Enable strict mode in TypeScript
+### Do's (Current Project Configuration)
 - ✅ Use interface over type for object shapes
-- ✅ Use type imports for type-only imports
+- ✅ Use type imports for type-only imports  
 - ✅ Type props and emits with interfaces
 - ✅ Use generic types for reusable components
 - ✅ Create type guards for runtime type checking
 - ✅ Use utility types for type transformations
 - ✅ Provide proper return types for functions
+- ✅ Leverage ES2022 features for modern syntax
+- ✅ Use `@/*` path aliases for cleaner imports
+
+### Recommended for Production
+- 🔄 Consider enabling strict mode gradually
+- 🔄 Enable `noUnusedLocals` and `noUnusedParameters`
+- 🔄 Add `exactOptionalPropertyTypes` for better optional type handling
+
+### 🔥 CRITICAL: Safe Object Index Patterns
+
+**PROBLEM**: Object index access can return `undefined`, causing type errors
+
+**❌ WRONG - Unsafe pattern that causes TS errors:**
+```typescript
+const statusTagType = computed(() => {
+  const types = {
+    active: 'success',
+    inactive: 'danger',
+  };
+  // ❌ ERROR: types[props.status] can be undefined
+  return types[props.status] || 'info';
+});
+```
+
+**✅ CORRECT - Type-safe patterns:**
+
+**Pattern 1: Explicit Record Type + Nullish Coalescing**
+```typescript
+const statusTagType = computed(() => {
+  const types: Record<UserStatus, 'success' | 'danger'> = {
+    active: 'success',
+    inactive: 'danger',
+  };
+  // ✅ SAFE: Explicit type + ?? operator
+  return types[props.status] ?? 'info';
+});
+```
+
+**Pattern 2: Type Guard Function**
+```typescript
+const getStatusType = (status: UserStatus): 'success' | 'danger' | 'info' => {
+  const types: Record<UserStatus, 'success' | 'danger'> = {
+    active: 'success',
+    inactive: 'danger',
+  };
+  return types[status] ?? 'info';
+};
+```
+
+**Pattern 3: Switch Statement**
+```typescript
+const statusTagType = computed((): 'success' | 'danger' | 'info' => {
+  switch (props.status) {
+    case 'active': return 'success';
+    case 'inactive': return 'danger';
+    default: return 'info';
+  }
+});
+```
 
 ### Don'ts
 - ❌ Use `any` type unless absolutely necessary
-- ❌ Ignore TypeScript errors
+- ❌ Ignore TypeScript errors completely
 - ❌ Mix runtime and type imports incorrectly
 - ❌ Forget to type props and emits
 - ❌ Create overly complex type definitions
 - ❌ Skip type safety in event handlers
 - ❌ Ignore generic type parameters
 - ❌ Use type assertions when type inference works
+- ❌ Rely on disabled strict mode for too long
+- ❌ **Use object index without explicit types - causes undefined errors**
+- ❌ **Use `||` operator for fallback - use `??` instead**
 
 ## Type Safety Checklist
 
@@ -537,10 +675,19 @@ export type { AuthState, LoginRequest } from './auth.types';
 - [ ] Type guards are used for runtime checks
 
 ### General TypeScript
-- [ ] Strict mode is enabled
-- [ ] No unused variables or parameters
-- [ ] No implicit any types
+- [ ] Current project configuration is understood
 - [ ] Proper type imports are used
 - [ ] Utility types are used appropriately
+- [ ] Element Plus types are properly imported
+- [ ] Vite-specific types are utilized
+- [ ] 🔥 **Object index access uses explicit Record types**
+- [ ] 🔥 **Nullish coalescing (??) used instead of logical OR (||)**
+- [ ] 🔥 **All computed properties with object access are type-safe**
+
+### Progressive Enhancement
+- [ ] [Optional] Enable strict mode when ready
+- [ ] [Optional] Enable unused variable checks
+- [ ] [Optional] Add more strict type checking rules
+- [ ] [Optional] Configure more specific path aliases if needed
 
 This TypeScript standards guide provides comprehensive patterns for type-safe Vue 3 development.

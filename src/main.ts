@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import router from './router';
 
 // Element Plus按需引入
 import {
@@ -32,6 +33,10 @@ import {
   ElTooltip,
   ElDivider,
   ElLoading,
+  ElTable,
+  ElTableColumn,
+  ElPagination,
+  ElMessageBox,
 } from 'element-plus';
 import 'element-plus/dist/index.css';
 
@@ -56,9 +61,15 @@ import {
   ZoomOut,
   Plus,
   Minus,
+  Edit,
+  View,
+  Search,
 } from '@element-plus/icons-vue';
 
 const app = createApp(App);
+
+// 注册路由
+app.use(router);
 
 // 注册Element Plus组件
 app.use(ElContainer);
@@ -89,6 +100,9 @@ app.use(ElDialog);
 app.use(ElTooltip);
 app.use(ElDivider);
 app.use(ElLoading);
+app.use(ElTable);
+app.use(ElTableColumn);
+app.use(ElPagination);
 
 // 注册图标
 app.component('QuestionFilled', QuestionFilled);
@@ -110,8 +124,12 @@ app.component('ZoomIn', ZoomIn);
 app.component('ZoomOut', ZoomOut);
 app.component('Plus', Plus);
 app.component('Minus', Minus);
+app.component('Edit', Edit);
+app.component('ViewIcon', View);
+app.component('Search', Search);
 
-// 全局配置ElMessage
+// 全局配置ElMessage和ElMessageBox
 app.config.globalProperties.$message = ElMessage;
+app.config.globalProperties.$messagebox = ElMessageBox;
 
 app.mount('#app');

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
 
 cd "$CLAUDE_PROJECT_DIR/.claude/hooks"

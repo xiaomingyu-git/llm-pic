@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 set -e
 
 # Post-tool-use hook that tracks edited files and their repos

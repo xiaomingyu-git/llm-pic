@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Skip if environment variable is set
 if [ -n "$SKIP_ERROR_REMINDER" ]; then

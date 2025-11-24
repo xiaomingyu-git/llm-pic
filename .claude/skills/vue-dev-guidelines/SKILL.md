@@ -1,6 +1,6 @@
 ---
 name: vue-dev-guidelines
-description: Vue 3 + TypeScript + Element Plus development guidelines. Modern patterns including Composition API, reactive data, proper component structure, TypeScript best practices, Element Plus integration, performance optimization, and file organization. Use when creating Vue components, pages, features, data fetching, styling, routing, or working with Vue 3 code.
+description: Vue 3 + TypeScript + Element Plus development guidelines. Modern patterns including Composition API, reactive data, proper component structure, TypeScript best practices, Element Plus integration, performance optimization, file organization, and **Context7 MCP integration for real-time documentation fetching**. Use when creating Vue components, pages, features, data fetching, styling, routing, or working with Vue 3 code.
 ---
 
 # Vue 3 Development Guidelines
@@ -39,6 +39,12 @@ Creating a Vue component? Follow this checklist:
 - [ ] Import Element Plus components as needed
 - [ ] Use scoped styles with CSS variables
 - [ ] Follow single-file component structure
+- [ ] 🔥 **CRITICAL: Object index access uses explicit `Record<Type, ReturnType>` types**
+- [ ] 🔥 **CRITICAL: Use nullish coalescing `??` instead of logical OR `||` for fallbacks**
+- [ ] 🔥 **CRITICAL: All computed properties with object access are type-safe**
+- [ ] **🔥 CRITICAL: Run `npx tsc --noEmit` - fix ALL TypeScript errors**
+- [ ] **🔥 CRITICAL: Run `npx eslint "src/**/*.{ts,vue}" --fix` - fix ALL ESLint errors**
+- [ ] **🔥 CRITICAL: Repeat until both checks show ZERO errors**
 
 ### New Feature Checklist
 
@@ -54,6 +60,42 @@ Creating a feature? Set up this structure:
 
 ---
 
+## Context7 MCP Integration
+
+This skill automatically integrates with Context7 MCP to fetch the latest Element Plus documentation when creating or modifying components. This ensures you're always using the most current APIs and best practices.
+
+### Automatic Documentation Access
+
+When working with Element Plus components, this skill will:
+- Fetch the latest component documentation from Context7
+- Provide up-to-date API references and examples
+- Include recent deprecation warnings and new features
+- Suggest modern alternatives to outdated patterns
+
+### How It Works
+
+1. **Component Creation**: When creating new Vue components with Element Plus, Context7 automatically retrieves the latest documentation
+2. **Component Modification**: When modifying existing Element Plus components, current best practices are fetched
+3. **Real-time Updates**: Documentation is fetched in real-time, ensuring you have the most current information
+
+### Example Usage
+
+```vue
+<!-- This skill will automatically fetch latest ElButton docs -->
+<template>
+  <el-button 
+    type="primary" 
+    :icon="Plus"
+    @click="handleAdd"
+  >
+    <!-- Uses latest Element Plus API and patterns -->
+    添加
+  </el-button>
+</template>
+```
+
+---
+
 ## Common Imports Cheatsheet
 
 ```vue
@@ -64,10 +106,10 @@ import { ref, reactive, computed, watch, onMounted } from 'vue';
 // Vue Router
 import { useRouter, useRoute } from 'vue-router';
 
-// Element Plus Components
+// Element Plus Components (latest docs fetched via Context7)
 import { ElButton, ElCard, ElForm, ElInput } from 'element-plus';
 
-// Element Plus Icons
+// Element Plus Icons (latest docs fetched via Context7)
 import { Plus, Delete, Edit } from '@element-plus/icons-vue';
 
 // Project Components
@@ -241,6 +283,74 @@ const userId = computed(() => route.params.id as string);
 
 ---
 
+### 🔍 TypeScript & ESLint Validation Workflow
+
+**CRITICAL STEP: Complete validation before component completion**
+
+After writing any Vue component, you MUST follow this workflow until both TypeScript and ESLint show no errors:
+
+#### Step 1: TypeScript Type Checking
+```bash
+# Check TypeScript compilation errors
+npx tsc --noEmit
+
+# Or use project's type check script if available
+npm run type-check
+```
+
+#### Step 2: ESLint Code Quality Check
+```bash
+# Check ESLint rules and formatting
+npx eslint "src/**/*.{ts,vue}"
+
+# Check specific component
+npx eslint src/components/YourComponent.vue
+```
+
+#### Step 3: Auto-fix ESLint Issues
+```bash
+# Auto-fix fixable ESLint issues
+npx eslint "src/**/*.{ts,vue}" --fix
+
+# Fix specific component
+npx eslint src/components/YourComponent.vue --fix
+```
+
+#### Step 4: Iterative Error Resolution
+Repeat until both checks pass completely:
+```bash
+# Run both checks together
+npm run check  # if configured
+# OR
+npx tsc --noEmit && npx eslint "src/**/*.{ts,vue}"
+```
+
+#### Common Error Fixes:
+
+**TypeScript Errors:**
+- Missing imports: Add proper imports
+- Type mismatches: Use proper TypeScript types
+- Element Plus types: `import type { FormInstance } from 'element-plus'`
+- Props/Emits: Define proper interfaces
+
+**ESLint Errors:**
+- Unused variables: Prefix with `_` (underscore)
+- Missing imports: Add missing dependencies
+- Formatting: Use `--fix` to auto-resolve
+- Vue rules: Follow Vue 3 Composition API patterns
+
+#### Validation Success Criteria:
+✅ `npx tsc --noEmit` runs with NO output (no errors)  
+✅ `npx eslint "src/**/*.{ts,vue}"` shows NO errors  
+✅ Component compiles and renders without console errors  
+✅ All imports resolve correctly  
+
+**Only when ALL checks pass completely is the component considered complete.**
+
+**[📖 Complete Guide: resources/typescript-standards.md](resources/typescript-standards.md)**
+
+---
+
 ### 📘 TypeScript Integration
 
 **Standards:**
@@ -262,8 +372,6 @@ interface Emits {
   (e: 'delete', id: number): void;
 }
 ```
-
-**[📖 Complete Guide: resources/typescript-standards.md](resources/typescript-standards.md)**
 
 ---
 
@@ -306,6 +414,7 @@ interface Emits {
 | Set up routing | [routing-guide.md](resources/routing-guide.md) |
 | Optimize performance | [performance.md](resources/performance.md) |
 | TypeScript integration | [typescript-standards.md](resources/typescript-standards.md) |
+| **🔥 Validate & Fix TS/ES Errors** | **[TypeScript & ESLint Validation Workflow](#--typescript--eslint-validation-workflow)** |
 | Common patterns | [common-patterns.md](resources/common-patterns.md) |
 | See full examples | [complete-examples.md](resources/complete-examples.md) |
 
@@ -418,6 +527,15 @@ const loading = ref(false);
 // Computed
 const processedData = computed(() => {
   return userData.value ? `${userData.value.name} - ${userData.value.email}` : '';
+});
+
+// 🔥 CRITICAL: Type-safe computed with object access example
+const statusType = computed((): 'success' | 'danger' | 'info' => {
+  const statusMap: Record<User['status'], 'success' | 'danger'> = {
+    active: 'success',
+    inactive: 'danger',
+  };
+  return statusMap[userData.value?.status || 'inactive'] ?? 'info';
 });
 
 // Methods

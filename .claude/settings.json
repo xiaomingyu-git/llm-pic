@@ -35,32 +35,23 @@
   },
   "mcpServers": {
     "acp": {
-      "command": "npx.cmd",
-      "args": [
-        "@modelcontextprotocol/server-filesystem",
-        "."
-      ],
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem", "."],
       "env": {
         "FILESYSTEM_ROOT": "."
       }
     },
     "context7": {
-      "command": "npx.cmd",
-      "args": [
-        "@context7/mcp"
-      ]
+      "command": "npx",
+      "args": ["@context7/mcp"]
     },
     "playwright": {
-      "command": "npx.cmd",
-      "args": [
-        "@playwright/mcp"
-      ]
+      "command": "npx",
+      "args": ["@playwright/mcp"]
     },
     "web-search-prime": {
-      "command": "npx.cmd",
-      "args": [
-        "@web-search-prime/mcp"
-      ]
+      "command": "npx",
+      "args": ["@web-search-prime/mcp"]
     }
   },
   "hooks": {

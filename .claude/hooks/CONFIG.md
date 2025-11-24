@@ -179,7 +179,7 @@ fi
 
 ### Global Environment Variables
 
-Set in your shell profile (`.bashrc`, `.zshrc`, etc.):
+Set in your shell profile (`.zshrc`, etc.):
 
 ```bash
 # Disable error handling reminders
@@ -393,7 +393,7 @@ You can create your own hooks for other events:
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/my-custom-bash-guard.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/my-custom-zsh-guard.sh"
           }
         ]
       }
