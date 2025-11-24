@@ -215,8 +215,8 @@ export const sortUsers = (
 
     // 处理日期类型
     if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
-      aValue = new Date(aValue).getTime();
-      bValue = new Date(bValue).getTime();
+      aValue = aValue ? new Date(aValue).getTime() : 0;
+      bValue = bValue ? new Date(bValue).getTime() : 0;
     }
 
     // 处理字符串类型

@@ -38,7 +38,6 @@ const vscodeTsSettings = {
   "typescript.noUnusedLocals.enabled": false,
   "typescript.preferences.strict": true,
   "typescript.disableAutomaticTypeAcquisition": false,
-  "typescript.validate.enable": true,
   "typescript.surfaces.enabled": true,
   "javascript.validate.enable": false,
   "vetur.validation.script": false,

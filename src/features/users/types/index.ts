@@ -4,6 +4,7 @@
  */
 
 // 从全局类型导入统一的 ApiResponse
+import type { ApiResponse } from '../../../types';
 export type { ApiResponse } from '../../../types';
 
 export interface User {
@@ -34,6 +35,9 @@ export interface PaginationConfig {
 }
 
 export interface UserListResponse extends ApiResponse<User[]> {
+  success: boolean;
+  data: User[];
+  message: string;
   total: number;
   page: number;
   pageSize: number;

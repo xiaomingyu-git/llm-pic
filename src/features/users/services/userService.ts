@@ -12,7 +12,8 @@ import type {
 } from '../types';
 
 class UserService {
-  private baseUrl = '/api/users';
+  // Base URL for API endpoints
+  // private baseUrl = '/api/users'; // Commented out as it's not currently used
 
   /**
    * 获取用户列表
@@ -241,7 +242,7 @@ class UserService {
   private generateMockData(count: number): User[] {
     const roles: Array<User['role']> = ['admin', 'user', 'moderator'];
     const statuses: Array<User['status']> = ['active', 'inactive'];
-    const names = [
+    const names: string[] = [
       '张三',
       '李四',
       '王五',
@@ -253,13 +254,13 @@ class UserService {
     ];
     const domains = ['qq.com', '163.com', 'gmail.com', 'outlook.com'];
 
-    return Array.from({ length: count }, (_, index) => ({
+    return Array.from({ length: count }, (_, index): User => ({
       id: index + 1,
-      name: names[index % names.length] + (index + 1),
+      name: (names[index % names.length] || '用户') + (index + 1),
       email: `user${index + 1}@${domains[index % domains.length]}`,
       phone: `138${String(index + 1).padStart(8, '0')}`,
-      role: roles[index % roles.length],
-      status: statuses[index % statuses.length],
+      role: roles[index % roles.length]!,
+      status: statuses[index % statuses.length]!,
       createdAt: new Date(
         Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
       ).toISOString(),
