@@ -73,6 +73,11 @@ export interface XMLNode {
   label: string;
   type: string;
   position?: { x: number; y: number };
+  x?: number; // 直接坐标属性
+  y?: number;
+  width?: number;
+  height?: number;
+  color?: string;
   attributes?: Record<string, any>;
   children?: XMLNode[];
 }
@@ -81,8 +86,11 @@ export interface XMLEdge {
   id: string;
   source: string;
   target: string;
+  from?: string; // 兼容性属性
+  to?: string;
   label?: string;
   type?: string;
+  color?: string;
   attributes?: Record<string, any>;
 }
 
@@ -93,6 +101,9 @@ export interface XMLDiagramData {
     type: string;
     options?: Record<string, any>;
   };
+  metadata?: {
+    [key: string]: any;
+  };
 }
 
 // Mock DOM types (for XML processing)
@@ -102,17 +113,21 @@ export interface MockElement {
   children: MockElement[];
   textContent?: string;
   getElementsByTagName(tagName: string): MockElement[];
+  querySelector(selector: string): MockElement | null;
   setAttribute(name: string, value: string): void;
-  getAttribute(name: string): string | null;
+  getAttribute(name: string): string | null | undefined;
 }
 
 export interface MockDocument {
   createElement(tagName: string): MockElement;
   getElementsByTagName(tagName: string): MockElement[];
+  querySelector(selector: string): MockElement | null;
+  querySelectorAll(selector: string): MockElement[];
   documentElement: MockElement;
 }
 
 export interface MockDOMParser {
+  new(): MockDOMParser;
   parseFromString(xmlString: string, mimeType: string): MockDocument;
 }
 
@@ -121,8 +136,12 @@ export interface DiagramGenerationOptions {
   style?: string;
   theme?: string;
   layout?: string;
-  format?: string;
+  format: string; // 改为必需属性
   direction?: string;
   timeout?: number;
   maxTokens?: number;
+  useColors?: boolean;
+  includeDetails?: boolean;
+  addIcons?: boolean;
+  generateCode?: boolean;
 }
