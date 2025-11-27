@@ -1,0 +1,26 @@
+{
+  "typescript": {
+    "tsserver": {
+      "useLocalTsdk": true,
+      "tsdkPath": "./node_modules/typescript/lib"
+    }
+  },
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["typescript-language-server"]
+    },
+    "Vue": {
+      "language_servers": ["vue-language-server"]
+    }
+  },
+  "language_servers": {
+    "typescript-language-server": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"]
+    },
+    "vue-language-server": {
+      "command": "vue-language-server",
+      "args": ["--stdio"]
+    }
+  }
+}

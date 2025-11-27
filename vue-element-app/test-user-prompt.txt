@@ -1,0 +1,2 @@
+Testing UserPromptSubmit hook
+This should trigger the UserPromptSubmit hook when I submit this message.

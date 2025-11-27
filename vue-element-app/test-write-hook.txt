@@ -1,0 +1,2 @@
+Testing Write tool hook trigger
+This should create a default session log entry if hooks work properly.

@@ -1,0 +1,12 @@
+# 错误日志目录
+# 用于存储本地错误跟踪文件
+
+## 文件结构
+- errors.json       - 综合错误日志
+- performance.json  - 性能监控数据
+- error-reports/    - 详细错误报告
+- error-stats.json  - 错误统计信息
+
+## 注意事项
+- 此目录下的文件应包含在 .gitignore 中
+- 定期清理过期日志以避免文件过大

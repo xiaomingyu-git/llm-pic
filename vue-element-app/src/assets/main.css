@@ -1,0 +1,42 @@
+@import './base.css';
+
+#app {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-weight: normal;
+  height: 100vh;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: block;
+  }
+
+  #app {
+    max-width: 1440px;
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1920px) {
+  #app {
+    max-width: 1600px;
+    padding: 0 32px;
+  }
+}

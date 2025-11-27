@@ -1,0 +1,468 @@
+{
+  "version": "1.0",
+  "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
+  "mcpPermissions": {
+    "enableAllProjectMcpServers": true,
+    "allowedTools": [
+      "Edit:*",
+      "Write:*",
+      "MultiEdit:*",
+      "NotebookEdit:*",
+      "Bash:*",
+      "Task:*",
+      "Glob:*",
+      "Grep:*",
+      "Read:*",
+      "WebFetch:*",
+      "WebSearch:*",
+      "ExitPlanMode:*",
+      "AskUserQuestion:*",
+      "TodoWrite:*",
+      "mcp__acp__Read:*",
+      "mcp__acp__Write:*",
+      "mcp__acp__Edit:*",
+      "mcp__acp__Bash:*",
+      "mcp__acp__BashOutput:*",
+      "mcp__acp__KillShell:*",
+      "mcp__context7__resolve-library-id:*",
+      "mcp__context7__get-library-docs:*",
+      "mcp__playwright__browser_*",
+      "mcp__web-reader__webReader:*",
+      "mcp__web-search-prime__webSearchPrime:*"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "skills": {
+    "skill-developer": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Meta-skill for creating and managing Claude Code skills",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "TodoWrite",
+        "Glob",
+        "Grep"
+      ],
+      "promptTriggers": {
+        "keywords": [
+          "skill system",
+          "create skill",
+          "add skill",
+          "skill triggers",
+          "skill rules",
+          "hook system",
+          "skill development",
+          "skill-rules.json",
+          "技能系统",
+          "创建技能",
+          "添加技能",
+          "技能触发",
+          "技能规则",
+          "钩子系统",
+          "技能开发"
+        ],
+        "intentPatterns": [
+          "(how do|how does|explain).*?skill",
+          "(create|add|modify|build).*?skill",
+          "skill.*?(work|trigger|activate|system)",
+          "技能.*?(如何|怎么|解释|说明)",
+          "(创建|添加|修改|构建).*?技能",
+          "技能.*?(工作|触发|激活|系统)"
+        ]
+      }
+    },
+    "vue-dev-guidelines": {
+      "type": "domain",
+      "enforcement": "block",
+      "priority": "critical",
+      "description": "Vue 3 + TypeScript + Element Plus best practices - Auto-activates for Vue projects",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "Task",
+        "TodoWrite",
+        "mcp__context7__resolve-library-id",
+        "mcp__context7__get-library-docs",
+        "mcp__playwright__browser_navigate",
+        "mcp__playwright__browser_snapshot",
+        "mcp__playwright__browser_click",
+        "mcp__playwright__browser_type",
+        "mcp__playwright__browser_console_messages",
+        "WebFetch",
+        "WebSearch"
+      ],
+      "promptTriggers": {
+        "keywords": [
+          "vue",
+          "component",
+          "template",
+          "script setup",
+          "composition api",
+          "element plus",
+          "router",
+          "pinia",
+          "vite",
+          "typescript",
+          "vue组件",
+          "组件",
+          "模板",
+          "组合式api",
+          "路由",
+          "功能模块",
+          "增加",
+          "添加",
+          "修改",
+          "更新",
+          "模块",
+          "页面",
+          "@.*\\.vue",
+          "文件加入上下文",
+          "上下文"
+        ],
+        "intentPatterns": [
+          "(create|make|build|write).*?vue",
+          "(fix|debug|resolve).*?vue.*?(component|error)",
+          "(implement|add|增加|添加).*?vue.*?(feature|function|模块|功能)",
+          "(refactor|optimize).*?vue",
+          "vue.*?(best.*practice|pattern|structure)",
+          "(创建|编写|构建).*?vue",
+          "(修复|调试).*?vue.*?(组件|错误)",
+          "(实现|添加|增加).*?vue.*?(功能|模块)",
+          "(重构|优化).*?vue",
+          ".*功能模块.*",
+          ".*模块.*",
+          "@.*\\.vue.*",
+          ".*文件.*上下文.*",
+          ".*加入上下文.*"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "*.vue",
+          "src/**/*.vue",
+          "src/views/**/*",
+          "src/components/**/*",
+          "src/router/**/*",
+          "src/stores/**/*",
+          "src/composables/**/*",
+          "vue.config.*",
+          "vite.config.*",
+          "tsconfig.*"
+        ],
+        "pathExclusions": [
+          "node_modules/**",
+          "dist/**",
+          ".git/**"
+        ],
+        "contentPatterns": [
+          "<template>",
+          "<script.*setup>",
+          "import.*from.*vue",
+          "defineComponent",
+          "ref\\(",
+          "reactive\\(",
+          "computed\\(",
+          "watch\\(",
+          "onMounted\\(",
+          "ElementPlus",
+          "vue-router"
+        ]
+      }
+    },
+    "frontend-error-fixer": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Vue frontend runtime error diagnosis and browser-based debugging",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Task",
+        "mcp__playwright__browser_navigate",
+        "mcp__playwright__browser_snapshot",
+        "mcp__playwright__browser_console_messages",
+        "mcp__playwright__browser_take_screenshot",
+        "mcp__playwright__browser_click",
+        "mcp__playwright__browser_fill_form",
+        "mcp__playwright__browser_type",
+        "mcp__playwright__browser_wait_for"
+      ],
+      "promptTriggers": {
+        "keywords": [
+          "frontend error",
+          "runtime error",
+          "vue error",
+          "component error",
+          "browser console",
+          "javascript error",
+          "network error",
+          "api error",
+          "element plus error",
+          "browser devtools",
+          "debug console",
+          "前端错误",
+          "运行时错误",
+          "Vue组件错误",
+          "浏览器控制台",
+          "网络错误",
+          "API错误",
+          "浏览器错误"
+        ],
+        "intentPatterns": [
+          "(fix|resolve|debug).*?(error|exception)",
+          "(fix|debug).*?(runtime|frontend|browser).*?(error|issue)",
+          "(vue|component).*?(error|not.*working)",
+          "(browser|console).*?(error|fail)",
+          "(api|fetch|request).*?(fail|error)",
+          "(element|el-).*?(error|not.*working)",
+          "(修复|调试).*?(运行时|浏览器|前端).*(错误|问题)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "src/**/*.vue",
+          "src/**/*.ts",
+          "*.vue",
+          "*.ts"
+        ],
+        "contentPatterns": [
+          "console\\.error",
+          "throw new Error",
+          "Cannot read property",
+          "is not defined",
+          "Failed to load",
+          "ElementPlus.*error",
+          "vue.*error",
+          "component.*error",
+          "runtime.*error"
+        ]
+      }
+    },
+    "error-tracking": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Local error logging and performance monitoring for Vue applications",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Task",
+        "mcp__playwright__browser_console_messages",
+        "mcp__playwright__browser_navigate",
+        "mcp__playwright__browser_snapshot"
+      ],
+      "promptTriggers": {
+        "keywords": [
+          "error tracking",
+          "error logging",
+          "performance monitoring",
+          "error analysis",
+          "debugging",
+          "debug",
+          "bug tracking",
+          "error report",
+          "monitoring",
+          "logging",
+          "error boundary",
+          "vue error",
+          "runtime error",
+          "project debugging",
+          "项目调试",
+          "错误跟踪",
+          "错误记录",
+          "性能监控",
+          "错误分析",
+          "调试",
+          "错误报告",
+          "监控",
+          "日志记录",
+          "错误边界"
+        ],
+        "intentPatterns": [
+          "(track|log|monitor).*?(error|exception|performance)",
+          "(add|implement).*?(error.*tracking|logging|monitoring)",
+          "(analyze|review).*?(errors|performance|logs)",
+          "(debug|fix).*?(error|bug)",
+          "(create|setup).*?(error.*boundary|error.*handling)",
+          "debug.*?(project|app|application)",
+          "(项目|应用).*?(调试|debug)",
+          "(track|log|monitor).*?(错误|异常|性能)",
+          "(添加|实现).*?(错误跟踪|日志|监控)",
+          "(分析|审查).*?(错误|性能|日志)",
+          "(调试|修复).*?(错误|bug)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "src/**/*.vue",
+          "src/**/*.ts",
+          "src/errors/**/*",
+          "src/utils/error*",
+          "*.vue",
+          "*.ts"
+        ],
+        "contentPatterns": [
+          "console\\.error",
+          "throw new Error",
+          "catch.*error",
+          "try.*catch",
+          "errorHandler",
+          "onErrorCaptured",
+          "error.*boundary",
+          "performance\\.now",
+          "measure.*performance"
+        ]
+      }
+    },
+    "typescript-error-resolver": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "TypeScript compilation, build, and strict mode error resolution",
+      "mcpTools": [
+        "mcp__acp__Read",
+        "mcp__acp__Write",
+        "mcp__acp__Edit",
+        "mcp__acp__Bash",
+        "Glob",
+        "Grep",
+        "TodoWrite",
+        "Task"
+      ],
+      "promptTriggers": {
+        "keywords": [
+          "typescript error",
+          "type error",
+          "compilation error",
+          "build error",
+          "strict mode",
+          "type mismatch",
+          "noImplicitAny",
+          "type definition",
+          "interface error",
+          "generic error",
+          "vue type error",
+          "prop type error",
+          "emit type error",
+          "vite error",
+          "eslint error",
+          "构建错误",
+          "类型错误",
+          "编译错误",
+          "类型不匹配",
+          "严格模式",
+          "类型定义",
+          "接口错误"
+        ],
+        "intentPatterns": [
+          "(fix|resolve).*?(typescript|type).*?(error)",
+          "(add|create).*?(type|interface|definition)",
+          "(strict.*mode|type.*safety).*?(error|violation)",
+          "(vue.*component).*?(type|prop|emit).*?(error)",
+          "(build|compile|run).*?(fail|error)",
+          "(vite|eslint|ts).*?(error|issue)",
+          "(修复|解决).*?(类型|TypeScript|构建|编译).*(错误)"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "src/**/*.ts",
+          "src/**/*.vue",
+          "tsconfig.*.json",
+          "*.ts",
+          "*.vue"
+        ],
+        "contentPatterns": [
+          "error TS[0-9]+",
+          "Cannot find name",
+          "Property.*does not exist",
+          "Type.*is not assignable",
+          "Argument of type.*is not assignable",
+          "Type.*missing.*property",
+          "build.*error",
+          "compilation.*error",
+          "vite.*error",
+          "eslint.*error"
+        ]
+      }
+    }
+  },
+  "notes": {
+    "enforcement_types": {
+      "suggest": "Skill suggestion appears but doesn't block execution",
+      "block": "Requires skill to be used before proceeding (guardrail)",
+      "warn": "Shows warning but allows proceeding"
+    },
+    "priority_levels": {
+      "critical": "Highest - Always trigger when matched",
+      "high": "Important - Trigger for most matches",
+      "medium": "Moderate - Trigger for clear matches",
+      "low": "Optional - Trigger only for explicit matches"
+    },
+    "customization": {
+      "pathPatterns": "Adjust to match your Vue project structure (src/components, src/views, etc.)",
+      "keywords": "Add Vue-specific terms relevant to your project (Element Plus, Vue Router, etc.)",
+      "intentPatterns": "Use regex for flexible user intent matching"
+    },
+    "mcpIntegration": {
+      "description": "MCP tools are now integrated with skills for enhanced functionality",
+      "mcpPermissions": "Global MCP permissions configuration for all skills",
+      "skillMcpTools": "Each skill has specific MCP tools it can access",
+      "toolMapping": {
+        "skill-developer": [
+          "File operations",
+          "Task management",
+          "Project search"
+        ],
+        "vue-dev-guidelines": [
+          "File operations",
+          "Code search",
+          "Library documentation",
+          "Browser testing",
+          "Web research"
+        ],
+        "frontend-error-fixer": [
+          "File operations",
+          "Browser automation",
+          "Code search",
+          "Error debugging",
+          "Task management"
+        ],
+        "typescript-error-resolver": [
+          "File operations",
+          "TypeScript compilation",
+          "Code search",
+          "Error resolution",
+          "Task management"
+        ],
+        "error-tracking": [
+          "File operations",
+          "Local error logging",
+          "Performance monitoring",
+          "Browser debugging",
+          "Code search",
+          "Task management"
+        ]
+      },
+      "automaticActivation": "Skills can now automatically call MCP tools when activated"
+    }
+  }
+}

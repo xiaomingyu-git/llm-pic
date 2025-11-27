@@ -1,0 +1,55 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "mysql",
+    "sequential-thinking",
+    "playwright"
+  ],
+  "permissions": {
+    "allow": [
+      "Edit:*",
+      "Write:*",
+      "MultiEdit:*",
+      "NotebookEdit:*",
+      "Bash:*"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx tsx .claude/hooks/skill-activation-prompt.ts"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /c/Users/xiaom/Desktop/simple/vue-element-app && .claude/hooks/post-tool-use-tracker.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /c/Users/xiaom/Desktop/simple/vue-element-app && .claude/hooks/tsc-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "cd /c/Users/xiaom/Desktop/simple/vue-element-app && .claude/hooks/trigger-build-resolver.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
